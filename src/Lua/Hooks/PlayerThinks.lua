@@ -53,6 +53,7 @@ addHook("PlayerSpawn", function(player)
 				end
 				
 				player.powers[pw_invulnerability] = 5*TICRATE
+				S_StartSound(nil, sfx_pray, player)
 			end
 		end
 	end
