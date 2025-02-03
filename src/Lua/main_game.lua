@@ -147,6 +147,7 @@ PTSR.default_playervars = {
 	pizzachase = false,
 	pizzachase_cooldown = 0,
 	pizzachase_time = 0,
+	pizzasprint_time = 0,
 	pizzamask = nil,
 	
 	laps = 0,

@@ -611,6 +611,8 @@ local function controls_angle(p)
 	end
 end
 
+-- Player Pizzaface
+local PLAYPF_SPEED = 28
 local function handle_pf_player_movement(player)
 	-- handle movement
 	-- community feedback recommended us that we do this
@@ -620,13 +622,16 @@ local function handle_pf_player_movement(player)
 	player.mo.momy = 0
 	player.mo.momz = 0
 
-	local speed = 28
+	local speed = PLAYPF_SPEED
 
 	if not player.ptsr.pizzachase then
 		player.ptsr.pizzachase_cooldown = max(0, $-1)
 
 		if player.ptsr.pfbuttons & BT_CUSTOM1 then
-			speed = $*3/2
+			player.ptsr.pizzasprint_time = min($ + 1, 15*TICRATE)
+			speed = $*3/2 + (player.ptsr.pizzasprint_time * 2730)
+		else
+			player.ptsr.pizzasprint_time = $/2
 		end
 
 		if player.cmd.forwardmove or player.cmd.sidemove then
@@ -672,7 +677,21 @@ local function handle_pf_player_movement(player)
 		end
 
 		if found_player and found_player.valid then
-			P_FlyTo(player.mo,found_player.x,found_player.y,found_player.z,speed*(FU*3/2),true)
+			player.ptsr.pizzasprint_time = min($ + 1, 15*TICRATE)
+
+			--speed up because some people like to add characters that go 700 fu/s
+			local speedboost = player.ptsr.pizzasprint_time * 1895
+			if (found_player.player.speed > PLAYPF_SPEED*found_player.scale * 3/2)
+				speedboost = $ + FixedDiv(
+					found_player.player.speed - PLAYPF_SPEED*found_player.scale * 3/2,
+					found_player.scale
+				)
+			end
+			speed = ($ * FU *3/2) + speedboost
+
+			P_FlyTo(player.mo, found_player.x, found_player.y, found_player.z, speed, true)
+		else
+			player.ptsr.pizzasprint_time = 0
 		end
 
 		player.ptsr.pizzachase_time = max(0, $-1)
