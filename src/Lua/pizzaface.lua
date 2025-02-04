@@ -681,7 +681,7 @@ local function handle_pf_player_movement(player)
 
 			--speed up because some people like to add characters that go 700 fu/s
 			local speedboost = player.ptsr.pizzasprint_time * 1895
-			if (found_player.player.speed > PLAYPF_SPEED*found_player.scale * 3/2)
+			if (found_player.player.speed > PLAYPF_SPEED*found_player.scale * 3/2) then
 				speedboost = $ + FixedDiv(
 					found_player.player.speed - PLAYPF_SPEED*found_player.scale * 3/2,
 					found_player.scale
