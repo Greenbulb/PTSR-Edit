@@ -629,7 +629,7 @@ local function handle_pf_player_movement(player)
 
 		if player.ptsr.pfbuttons & BT_CUSTOM1 then
 			player.ptsr.pizzasprint_time = min($ + 1, 15*TICRATE)
-			speed = $*3/2 + (player.ptsr.pizzasprint_time * 2730)
+			speed = $*3/2 + (player.ptsr.pizzasprint_time * 2030)
 		else
 			player.ptsr.pizzasprint_time = $/2
 		end
