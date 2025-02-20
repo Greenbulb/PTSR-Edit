@@ -18,7 +18,7 @@ PTSR.PFMaskData = {
 	{
 		name = "Pizzaface",
 		state = S_PIZZAFACE,
-		scale = FU/2,
+		scale = FU,
 		trails = {SKINCOLOR_RED, SKINCOLOR_GREEN},
 		sound = sfx_pizzah,
 		emoji = ":pizza:",
