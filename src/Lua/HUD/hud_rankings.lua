@@ -3,33 +3,47 @@ local scoreboard_hud = function(v, player)
 	if not multiplayer then return end
 
 	local zinger_text = "LEADERBOARD"
-	local zinger_x = 160*FRACUNIT
-	local zinger_y = 10*FRACUNIT
-	local player_sep = 17*FRACUNIT -- separation of player infos 
+	local zinger_x = 160*FU
+	local zinger_y = 10*FU
+	local player_sep = 17*FU -- separation of player infos 
 
 	local player_list = {}
+	local faces = {}
+
 	for _player in players.iterate do
-		if not _player.spectator and not _player.ptsr.pizzaface then
-			table.insert(player_list, _player)
+		if _player.spectator then continue end
+
+		if _player.ptsr.pizzaface
+			table.insert(faces, _player)
+			continue
 		end
+		table.insert(player_list, _player)
 	end
 
 	table.sort(player_list, function(a,b) return a.score > b.score end)
 
+	--pizzafaces go to the back
+	for _, _player in ipairs(faces) do
+		table.insert(player_list, _player)
+	end
+
+	--draw the bar OUTSIDE of the iterator, no reason to draw this 20 times
+	v.drawFill(0, 25, 640, 1, V_SNAPTOTOP|V_SNAPTOLEFT) -- bar 
+		
 	for i=1,#player_list do
-		if i > 20 then continue end
+		if i > 20 then break end
 		
 		local _player = player_list[i]
 		local _skinname = skins[_player.realmo.skin].name
 		local _colormap = v.getColormap(_skinname, _player.skincolor)
 		local _skinpatch = v.getSprite2Patch(_player.realmo.skin, SPR2_XTRA)
 		local commonflags = (V_SNAPTOLEFT|V_SNAPTOTOP)
-		local playernameflags = (_player == consoleplayer) and V_YELLOWMAP or V_GRAYMAP
+		local playernameflags = (_player == consoleplayer) and V_YELLOWMAP or (_player.ptsr.pizzaface and V_REDMAP or V_GRAYMAP)
 		playernameflags = $|V_ALLOWLOWERCASE
 		local aliveflag = (_player.playerstate ~= PST_LIVE or _player.quittime > 0) and V_50TRANS or 0
 		
 		local playerpingcolor
-		local rawpingstring = (_player.quittime) and "QUIT" or _player.ping
+		local rawpingstring = (_player == server) and "SERV" or ((_player.quittime) and "QUIT" or _player.ping)
 		local drawping = rawpingstring
 		
 		if _player.ping < 128 then
@@ -43,71 +57,122 @@ local scoreboard_hud = function(v, player)
 		if _player.quittime
 			playerpingcolor = V_REDMAP|((leveltime/TICRATE % 2) and V_50TRANS or 0) --hacky
 		else
-			drawping = (_player == server) and "SERV" or $.."ms"
-			playerpingcolor = $|((_player == server) and V_BLUEMAP or 0)
+			if (_player ~= server) then
+				drawping = $.."ms"
+			else
+				playerpingcolor = $|V_BLUEMAP
+			end
 		end
 		
-		local _xcoord = 22*FRACUNIT
-		local _ycoord = 15*FRACUNIT + (i*player_sep)
+		local _xcoord = 22*FU
+		local _ycoord = 15*FU + (i*player_sep)
 
 		if i > 10 then
-			_xcoord = $ + 160*FRACUNIT
+			_xcoord = $ + 160*FU
 			_ycoord = $ - (10*player_sep)
-			commonflags = $ & ~V_SNAPTOLEFT
-			commonflags = $ | V_SNAPTORIGHT
+			commonflags = $|V_SNAPTORIGHT &~V_SNAPTOLEFT
 		end
-		-- [Player Icon] --
-		v.drawScaled(_xcoord, _ycoord, FRACUNIT/2,
-		_skinpatch, (commonflags)|aliveflag, _colormap)
 
-		-- [Player Rank] --
-		v.drawScaled(_xcoord - 16*FRACUNIT + 8*FRACUNIT, _ycoord + 8*FRACUNIT, FRACUNIT/4, 
-		PTSR.r2p(v,_player.ptsr.rank), commonflags)
+		if not _player.ptsr.pizzaface then
+			-- [Player Icon] --
+			v.drawScaled(_xcoord - FU, _ycoord, FU/2,
+				_skinpatch, (commonflags)|aliveflag, _colormap
+			)
 
-		/*
-		if _player.timeshit then -- no p rank for you noob, but on score hud
-			v.drawScaled(_xcoord - 16*FRACUNIT, _ycoord, FRACUNIT/4, 
-			PTSR.r2p(v, "BROKEN"), commonflags|V_20TRANS)
+			-- [Player Rank] --
+			v.drawScaled(_xcoord - 16*FU + 8*FU, _ycoord + 8*FU, FU/4, 
+				PTSR.r2p(v,_player.ptsr.rank), commonflags
+			)
+		else
+			/*
+			local mask_data = PTSR.PFMaskData[_player.ptsr.pizzastyle or 1]
+			local mask_state = mask_data.state or S_PIZZAFACE
+
+			--get the frame we want
+			local mask_sprite = states[mask_state].sprite
+			local mask_patch = v.getSpritePatch(mask_sprite, A)
+
+			local scale = FixedDiv(mask_data.scale, (mask_patch.width * mask_patch.height)*5)
+			scale = FixedMul($, mask_data.scale)
+			print(string.format("%f",scale))
+
+			--get the offets so we can make this a "top-left-corner aligned" patch
+			local off = {
+				FixedMul(mask_patch.leftoffset*FU, scale),
+				FixedMul(mask_patch.topoffset*FU, scale),
+			}
+
+			v.drawScaled(
+				_xcoord - FU + off[1],
+				_ycoord + off[2],
+				FU/2,
+				v.cachePatch("CHARICO"),
+				commonflags
+			)
+			v.drawScaled(
+				_xcoord - FU + mask_patch.width*scale,
+				_ycoord + off[2],
+				FU/2,
+				v.cachePatch("CHARICO"),
+				commonflags
+			)
+			
+			v.drawScaled(
+				_xcoord - FU + off[1],
+				_ycoord + off[2],
+				scale,
+				mask_patch,
+				(commonflags)|aliveflag|V_30TRANS, v.getColormap(TC_DEFAULT, _player.skincolor)
+			)
+			*/
+
+			-- [Pizzaface Icon] --
+			v.drawScaled(_xcoord - FU, _ycoord, FU/8,
+				v.cachePatch("PTSR_FACEICON"), (commonflags)|aliveflag
+			)
+
 		end
-		*/
 		
-		--max here because it looks weird with 0 score
-		local scorewidth = max(v.stringWidth(tostring(_player.score), (commonflags|playernameflags)),v.stringWidth("00", (commonflags|playernameflags)))
-		local scoreandpingwidth = scorewidth + v.stringWidth(rawpingstring, (commonflags))
+		local scorewidth = v.stringWidth(tostring(_player.score), (commonflags|playernameflags), "thin") + 11
+		local scoreandpingwidth = scorewidth + v.stringWidth(drawping, (commonflags), "thin")
 		
-		-- [ Bar Things] --
-		v.drawFill(0, 25, 640, 1, V_SNAPTOTOP+V_SNAPTOLEFT) -- bar 
-		--v.drawFill(160, 25, 1, 640, V_SNAPTOTOP)
-
 		-- [Player Name] --
-		v.drawString( _xcoord + 16*FRACUNIT, _ycoord,  _player.name, (commonflags|playernameflags|aliveflag), "thin-fixed")
+		v.drawString(_xcoord + 16*FU,								_ycoord,		_player.name,					(commonflags|playernameflags|aliveflag),	"thin-fixed")
 		
-		-- [Player Score] --
-		v.drawString(_xcoord + 16*FRACUNIT, _ycoord + 8*FRACUNIT, tostring(_player.score), (commonflags), "thin-fixed")
+		if not _player.ptsr.pizzaface then
+			-- [Player Score] --
+			v.drawString(_xcoord + 16*FU,							_ycoord + 8*FU,	tostring(_player.score),		(commonflags),								"thin-fixed")
 
-		v.drawString( _xcoord +8*FRACUNIT+(scorewidth*FU), _ycoord+8*FRACUNIT,  drawping, (commonflags|playerpingcolor), "thin-fixed")
-		v.drawString( _xcoord +16*FRACUNIT+(scoreandpingwidth*FU), _ycoord+8*FRACUNIT,  "laps: ".._player.ptsr.laps, (commonflags), "thin-fixed")
-		--v.drawString(int x, int y, string text, [int flags, [string align]])
-	
+			-- [Player Ping] --
+			v.drawString(_xcoord + 8*FU + (scorewidth*FU),			_ycoord + 8*FU,	drawping,						(commonflags|playerpingcolor),				"thin-fixed")
+			
+			-- [Player Laps] --
+			v.drawString(_xcoord + 16*FU + (scoreandpingwidth*FU),	_ycoord + 8*FU,	"laps: ".._player.ptsr.laps,	(commonflags),								"thin-fixed")
+		else
+			-- [Pizzaface Ping] --
+			v.drawString(_xcoord + 16*FU, _ycoord + 8*FU, drawping, (commonflags|playerpingcolor), "thin-fixed")
+		end
+		
 		-- show crown in leaderboard
 		-- GAMEMODE: JUGGERNAUT exclusive
 		if _player.realmo.hascrown then
 			local crown_spr = v.getSpritePatch(SPR_C9W3)
 			
-			v.drawScaled(_xcoord, _ycoord+(4*FU), FRACUNIT/4,
-			crown_spr, (commonflags)|aliveflag)
+			v.drawScaled(_xcoord, _ycoord+(4*FU), FU/4,
+				crown_spr, (commonflags)|aliveflag
+			)
 		end
 		
 		-- [Finish Flag] --
 		if (_player.ptsr.outofgame)
-			v.drawScaled(_xcoord - 6*FRACUNIT,_ycoord+11*FRACUNIT,FU/2,
+			v.drawScaled(_xcoord - 6*FU,_ycoord+11*FU,FU/2,
 				v.getSpritePatch(SPR_FNSF,A,0),
 				(commonflags)|V_FLIP
 			)		
 		end
 	end 
 
-	customhud.CustomFontString(v, zinger_x, zinger_y, zinger_text, "PTFNT", (V_SNAPTOTOP), "center", FRACUNIT/4, SKINCOLOR_BLUE)
+	customhud.CustomFontString(v, zinger_x, zinger_y, zinger_text, "PTFNT", (V_SNAPTOTOP), "center", FU/4, SKINCOLOR_BLUE)
 end
 
 customhud.SetupItem("rankings", ptsr_hudmodname, scoreboard_hud, "scores", 1) -- override vanilla rankings hud
