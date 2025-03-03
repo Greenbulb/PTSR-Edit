@@ -455,6 +455,14 @@ CV_PTSR.voteseconds = CV_RegisterVar({
 	PossibleValue = CV_Unsigned, 
 })
 
+CV_PTSR.serversided_enemyrespawn = CV_RegisterVar({
+	name = "PTSR_serversided_enemyrespawn",
+	defaultvalue = "off",
+	flags = CV_NETVAR,
+	PossibleValue = CV_OnOff, 
+})
+
+
 local luaOnly = "iamlua" .. P_RandomFixed()
 
 COM_AddCommand("_PTSR_pizzastyle_sync", function(player, blah, set)
