@@ -196,7 +196,7 @@ addHook("ThinkFrame", function()
 	local cyclesleft = 50
 	
 	if serversided then
-		cyclesleft = 15
+		cyclesleft = 5
 	end
 	
 	while cyclesleft > 0 do
@@ -302,7 +302,7 @@ addHook("ThinkFrame", function()
 			if #respawn_queue then
 				local arglist = ""
 				
-				for i=1, #teleport_queue do
+				for i=1, #respawn_queue do
 					arglist = $ .. respawn_queue[i] .. " "
 				end
 				
