@@ -132,6 +132,16 @@ COM_AddCommand("ptsr_timeto1", function(player)
 	
 	PTSR.timeleft = 1
 end, 1)
+
+COM_AddCommand("ptsr_timeto20", function(player)
+	if not PTSR.IsPTSR() then
+		CONS_Printf(player, "Command must be ran in the Pizza Time Spice Runners mode.")
+		return
+	end
+	
+	PTSR.timeleft = 20*TICRATE
+end, 1)
+
 // ADDED FOR TESTING PURPOSES
 
 CV_PTSR.x_positioning = CV_RegisterVar({
