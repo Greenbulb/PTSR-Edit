@@ -124,6 +124,8 @@ rawset(_G, "PTSR", { -- variables
 	nextgamemode = 1,
 
 	pizzas = {},
+	
+	BubbleMobjList = {},
 })
 
 PTSR.isOvertime = function()
@@ -373,7 +375,9 @@ addHook("NetVars", function(net)
 		
 		"pizzaface_speed_multi",
 
-		"pizzas"
+		"pizzas",
+		
+		"BubbleMobjList",
 	}
 	
 	for i,v in ipairs(sync_list) do
@@ -471,7 +475,7 @@ addHook("ThinkFrame", do
 				
 				if PTSR.timeleft <= 0 then
 					PTSR.timeleft = 0
-					if multiplayer then
+					if multiplayer then -- ITS OVERTIME!
 						PTSR.timeover = true
 						
 						local timeover_text = "\x8F*Overtime!"
@@ -493,6 +497,30 @@ addHook("ThinkFrame", do
 						local overtime_triggertag = mapheaderinfo[gamemap].ptsr_overtime_triggertag
 						if overtime_triggertag and tonumber(overtime_triggertag) then
 							P_LinedefExecute(tonumber(overtime_triggertag))
+						end
+						
+						
+						for i=1,#PTSR.BubbleMobjList do
+							local bubble = PTSR.BubbleMobjList[i]
+							
+							bubble.bubbleactive = true
+							bubble.state = S_PT_BUBBLE
+							bubble.displaypower.state = S_PT_BUBBLE3
+							bubble.bubblepower = PTSR.bubble_shoesid
+							
+							local powerdef = PTSR.BubblePowers[bubble.bubblepower] or PTSR.BubblePowers[1] or error("No bubbledefs exist.")
+							
+							if powerdef.sprite == nil then
+								bubble.displaypower.sprite = SPR_TVRI 
+							else
+								bubble.displaypower.sprite = powerdef.sprite
+							end
+							
+							if powerdef.frame == nil then
+								bubble.displaypower.frame = C
+							else
+								bubble.displaypower.frame = powerdef.frame
+							end
 						end
 					elseif not (PTSR.aipf
 					and PTSR.aipf.valid)

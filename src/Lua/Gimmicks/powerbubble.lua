@@ -193,6 +193,23 @@ PTSR:AddBubblePower({
 	pop_color = SKINCOLOR_YELLOW
 })
 
+
+PTSR.bubble_shoesid = PTSR:AddBubblePower({
+	name = "Speed Shoes",
+	pickup_func = function(toucher)
+		if toucher and toucher.valid and toucher.player and toucher.player.valid then
+			local player = toucher.player
+
+			player.powers[pw_sneakers] = $ + 10*TICRATE
+		end
+	end,
+	sprite = SPR_TVSS,
+	frame = C,
+	--disable_popsound = true,
+	pop_color = SKINCOLOR_RED,
+	disable_spawn = true,
+})
+
 function A_PT_BubbleFloatAnim(actor, var1) -- var1: color
 	local angles = 6
 	
@@ -216,9 +233,14 @@ end
 addHook("TouchSpecial", function(special, toucher)
 	local popcolor = SKINCOLOR_AZURE
 	
+	if not special.bubbleactive then
+		return true
+	end
+	
 	if special.displaypower and special.displaypower.valid then
 		P_SpawnGhostMobj(special.displaypower)
-		P_RemoveMobj(special.displaypower)
+		--P_RemoveMobj(special.displaypower)
+		special.displaypower.state = S_INVISIBLE
 	end
 	
 	if special.bubblepower and PTSR.BubblePowers[special.bubblepower] then
@@ -241,11 +263,26 @@ addHook("TouchSpecial", function(special, toucher)
 	end
 	
 	A_PT_BubbleFloatAnim(special, popcolor)
+	
+	special.bubbleactive = false
+	special.state = S_INVISIBLE
+	
+	return true
 end, MT_PT_BUBBLE)
 
 addHook("MobjSpawn", function(bubble)
-	bubble.bubblepower = P_RandomRange(1, #PTSR.BubblePowers)
+	local powerlist = {}
+
+	for i=1, #PTSR.BubblePowers do
+		if not PTSR.BubblePowers[i].disable_spawn then
+			table.insert(powerlist, i)
+		end
+	end
+	
+	bubble.bubblepower = powerlist[P_RandomRange(1, #powerlist)]
+	
 	bubble.displaypower = P_SpawnMobj(bubble.x, bubble.y, bubble.z+24*FU, MT_PT_BUBBLEPOWER)
+	bubble.bubbleactive = true
 	
 	local powerdef = PTSR.BubblePowers[bubble.bubblepower] or PTSR.BubblePowers[1] or error("No bubbledefs exist.")
 	
@@ -264,7 +301,23 @@ addHook("MobjSpawn", function(bubble)
 	else
 		bubble.displaypower.frame = powerdef.frame
 	end
+	
+	PTSR.BubbleMobjList[#PTSR.BubbleMobjList + 1] = bubble
 end, MT_PT_BUBBLE)
+
+addHook("ThinkFrame", function()
+	if not multiplayer then return end
+	
+	if PTSR and PTSR.BubbleMobjList then
+		if #PTSR.BubbleMobjList > 0 then
+			for i,bubble in ipairs(PTSR.BubbleMobjList) do
+				if not (bubble and bubble.valid) then
+					table.remove(PTSR.BubbleMobjList, i)
+				end
+			end
+		end
+	end
+end)	
 
 addHook("MapThingSpawn", function(mobj)
 	if not multiplayer then return end

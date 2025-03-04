@@ -78,7 +78,7 @@ addHook("PlayerThink", function(player)
 		player.playerstate = PST_REBORN
 	end
 
-	if PTSR.pizzatime and PTSR.timeover and not gm_metadata.disableovertimeshoes then
+	if PTSR.pizzatime and PTSR.timeover and gm_metadata.overtimeshoes then
 		player.powers[pw_sneakers] = 1
 	end
 
