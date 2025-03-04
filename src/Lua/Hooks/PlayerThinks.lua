@@ -15,6 +15,7 @@ states[S_PT_PARRY] = {
     nextstate = S_PT_PARRY
 }
 
+freeslot("sfx_ptpray")
 
 -- simple midgame joining blocker, variable init & more
 addHook("PlayerSpawn", function(player)
@@ -53,7 +54,7 @@ addHook("PlayerSpawn", function(player)
 				end
 				
 				player.powers[pw_invulnerability] = 5*TICRATE
-				S_StartSound(nil, sfx_pray, player)
+				S_StartSound(nil, sfx_ptpray, player)
 			end
 		end
 	end
