@@ -497,6 +497,7 @@ addHook("MobjThinker", function(mobj)
 		end
 
 		-- t in tx means "player that we're TARGETING"
+        -- means "TEXAS" actually
 		local tx = mobj.pizza_target.x
 		local ty = mobj.pizza_target.y
 		local tz = mobj.pizza_target.z
@@ -614,6 +615,7 @@ end
 
 -- Player Pizzaface
 local PLAYPF_SPEED = 28*FU
+local PLAYPF_DEADZONE = 50 / 10
 local function handle_pf_player_movement(player)
 	-- handle movement
 	-- community feedback recommended us that we do this
@@ -635,10 +637,12 @@ local function handle_pf_player_movement(player)
 			player.ptsr.pizzasprint_time = $/2
 		end
 
-		if player.cmd.forwardmove or player.cmd.sidemove then
+		if max(player.cmd.forwardmove, player.cmd.sidemove) > PLAYPF_DEADZONE then
 			local angle = controls_angle(player)
-			player.mo.momx = P_ReturnThrustX(nil, angle, speed)
-			player.mo.momy = P_ReturnThrustY(nil, angle, speed)
+            local frac = FixedDiv(FixedHypot(player.cmd.sidemove << 16, player.cmd.forwardmove << 16), 50*FU)
+
+			player.mo.momx = P_ReturnThrustX(nil, angle, FixedMul(speed,frac))
+			player.mo.momy = P_ReturnThrustY(nil, angle, FixedMul(speed,frac))
 		end
 
 		if player.ptsr.pfbuttons & BT_JUMP then
