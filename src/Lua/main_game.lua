@@ -217,6 +217,9 @@ PTSR.default_playervars = {
 	},
 	
 	isWinner = false, -- have they won a round (most points surviving)
+	
+	-- Shields
+	atrraction_timer = 0,
 }
 PTSR.gamemode_list = {}
 

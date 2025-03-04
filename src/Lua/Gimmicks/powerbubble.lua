@@ -174,12 +174,13 @@ PTSR:AddBubblePower({
 	pop_color = SKINCOLOR_GALAXY
 })
 
-/*
 PTSR:AddBubblePower({
 	name = "Attraction Shield",
 	pickup_func = function(toucher)
 		if toucher and toucher.valid and toucher.player and toucher.player.valid then
 			local player = toucher.player
+			
+			player.ptsr.atrraction_timer = 10*TICRATE
 			
 			P_SwitchShield(player, SH_ATTRACT)
 			P_SpawnShieldOrb(player)
@@ -191,7 +192,6 @@ PTSR:AddBubblePower({
 	--disable_popsound = true,
 	pop_color = SKINCOLOR_YELLOW
 })
-*/
 
 function A_PT_BubbleFloatAnim(actor, var1) -- var1: color
 	local angles = 6

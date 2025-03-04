@@ -108,11 +108,6 @@ customhud.SetupFont("PTLAP")
 
 dofile "main_game.lua"
 
-/*
--- SAXA HERE HI I DO DA TITLECARDIANERY
-dofile "titlecards.lua"
-*/
-
 dofile "Functions/end_game.lua"
 dofile "Functions/get_ringcount.lua"
 dofile "Functions/is_ptsr.lua"
@@ -126,6 +121,8 @@ dofile "Hooks/PlayerThinks.lua"
 dofile "Hooks/PlayerDeath.lua"
 dofile "Hooks/PlayerTweaks.lua"
 dofile "Hooks/LineTriggerSystem.lua"
+
+dofile "PlayerScripts/Shields/player_attractionhandle.lua"
 
 dofile "PlayerScripts/player_resetplayervars.lua"
 dofile "PlayerScripts/player_parry.lua"
