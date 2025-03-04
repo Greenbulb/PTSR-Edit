@@ -7,6 +7,8 @@ PTSR.LapTP = function(player, invincibility)
 	player.ptsr.outofgame = 0
 	
 	P_SetOrigin(player.mo, PTSR.end_location.x,PTSR.end_location.y, PTSR.end_location.z)
+    P_ResetPlayer(player)
+    player.pflags = $ &~(PF_JUMPDOWN|PF_SPINDOWN)
 	
 	player.mo.angle = PTSR.end_location.angle - ANGLE_90
 	
