@@ -462,6 +462,14 @@ CV_PTSR.serversided_enemyrespawn = CV_RegisterVar({
 	PossibleValue = CV_OnOff, 
 })
 
+CV_PTSR.serversided_enemyrespawn_debug = CV_RegisterVar({
+	name = "PTSR_serversided_enemyrespawn_debug",
+	defaultvalue = "off",
+	flags = 0,
+	PossibleValue = CV_OnOff, 
+})
+
+
 
 local luaOnly = "iamlua" .. P_RandomFixed()
 

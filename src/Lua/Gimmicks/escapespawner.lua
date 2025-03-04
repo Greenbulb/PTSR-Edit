@@ -132,7 +132,9 @@ COM_AddCommand("_PTSR_SS_ENEMY_RESPAWN", function(player, testkey, ...)
 				PTSR.EscapeSpawnFromTable(v)
 				v.pending = false
 				
-				print("Spawned: ".. arg.. " " .. i)
+				if CV_PTSR.serversided_enemyrespawn_debug.value then
+					print("Spawned: ".. arg.. " " .. i)
+				end
 			end
 		end
 	end
@@ -170,7 +172,9 @@ COM_AddCommand("_PTSR_SS_ENEMY_TELEPORT", function(player, testkey, ...)
 				P_SpawnMobj(v.x, v.y, v.z, MT_ESCAPESPAWNER_ANIM)
 				S_StartSound(v.child, sfx_espawn)
 				
-				print("Teleported: ".. arg.. " " .. i)
+				if CV_PTSR.serversided_enemyrespawn_debug.value then
+					print("Teleported: ".. arg.. " " .. i)
+				end
 			end
 		end
 	end
