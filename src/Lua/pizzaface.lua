@@ -497,6 +497,7 @@ addHook("MobjThinker", function(mobj)
 		end
 
 		-- t in tx means "player that we're TARGETING"
+        -- means "TEXAS" actually
 		local tx = mobj.pizza_target.x
 		local ty = mobj.pizza_target.y
 		local tz = mobj.pizza_target.z
@@ -597,22 +598,24 @@ end, MT_PIZZA_ENEMY)
 local function controls_angle(p)
 	local forwardmove = p.cmd.forwardmove
 	local sidemove = p.cmd.sidemove
+
 	if not (p.mo and p.mo.flags2 & MF2_TWOD) then
 		local camera_angle = (p.cmd.angleturn<<16)
-		local controls_angle = R_PointToAngle2(0,0, forwardmove*FU, -sidemove*FU)
+		local controls_angle = R_PointToAngle2(0,0, forwardmove<<16, -sidemove<<16)
 
-		return camera_angle+controls_angle
+		return camera_angle + controls_angle
 	end
 
 	if sidemove > 0 then
-		return ANGLE_45
+		return 0
 	elseif sidemove < 0 then
-		return InvAngle(ANGLE_45)
+		return ANGLE_180
 	end
 end
 
 -- Player Pizzaface
-local PLAYPF_SPEED = 28
+local PLAYPF_SPEED = 28*FU
+local PLAYPF_DEADZONE = 50 / 10
 local function handle_pf_player_movement(player)
 	-- handle movement
 	-- community feedback recommended us that we do this
@@ -629,23 +632,23 @@ local function handle_pf_player_movement(player)
 
 		if player.ptsr.pfbuttons & BT_CUSTOM1 then
 			player.ptsr.pizzasprint_time = min($ + 1, 15*TICRATE)
-			speed = $*3/2 + (player.ptsr.pizzasprint_time * 2030)
+			speed = ($*3/2) + (player.ptsr.pizzasprint_time * 2030)
 		else
 			player.ptsr.pizzasprint_time = $/2
 		end
 
-		if player.cmd.forwardmove or player.cmd.sidemove then
+		if max(player.cmd.forwardmove, player.cmd.sidemove) > PLAYPF_DEADZONE then
 			local angle = controls_angle(player)
-			local hypot = FixedHypot(player.cmd.sidemove*FU, player.cmd.forwardmove*FU)
+            local frac = FixedDiv(FixedHypot(player.cmd.sidemove << 16, player.cmd.forwardmove << 16), 50*FU)
 
-			player.mo.momx = speed*FixedMul(cos(angle), hypot/50)
-			player.mo.momy = speed*FixedMul(sin(angle), hypot/50)
+			player.mo.momx = P_ReturnThrustX(nil, angle, FixedMul(speed,frac))
+			player.mo.momy = P_ReturnThrustY(nil, angle, FixedMul(speed,frac))
 		end
 
 		if player.ptsr.pfbuttons & BT_JUMP then
-			player.mo.momz = speed*FU
+			player.mo.momz = speed
 		elseif player.ptsr.pfbuttons & BT_SPIN then
-			player.mo.momz = speed*-FU
+			player.mo.momz = -speed
 		end
 
 		if not (player.ptsr.pizzachase_cooldown)
@@ -681,13 +684,13 @@ local function handle_pf_player_movement(player)
 
 			--speed up because some people like to add characters that go 700 fu/s
 			local speedboost = player.ptsr.pizzasprint_time * 1895
-			if (found_player.player.speed > PLAYPF_SPEED*found_player.scale * 3/2) then
+			if (found_player.player.speed > FixedMul(PLAYPF_SPEED, found_player.scale) * 3/2) then
 				speedboost = $ + FixedDiv(
-					found_player.player.speed - PLAYPF_SPEED*found_player.scale * 3/2,
+					found_player.player.speed - FixedMul(PLAYPF_SPEED, found_player.scale) * 3/2,
 					found_player.scale
 				)
 			end
-			speed = ($ * FU *3/2) + speedboost
+			speed = ($*3/2) + speedboost
 
 			P_FlyTo(player.mo, found_player.x, found_player.y, found_player.z, speed, true)
 		else
@@ -750,7 +753,7 @@ addHook("PlayerThink", function(player)
 					S_StartSound(player.mo, PTSR.PFMaskData[player.ptsr.pizzastyle].sound)
 				end
 
-				if not PTSR.showtime // hiiii adding onto this for showtime
+				if not PTSR.showtime -- hiiii adding onto this for showtime
 					PTSR.showtime = true
 					local anim = animationtable['pizzaface']
 					if anim then
