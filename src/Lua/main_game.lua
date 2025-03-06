@@ -509,6 +509,8 @@ addHook("ThinkFrame", do
 							bubble.bubblepower = PTSR.bubble_shoesid
 							
 							PTSR.RefreshBubbleIcon(bubble)
+							
+							bubble.bubblerespawntics = 0
 						end
 					elseif not (PTSR.aipf
 					and PTSR.aipf.valid)

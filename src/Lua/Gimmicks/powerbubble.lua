@@ -275,19 +275,35 @@ addHook("TouchSpecial", function(special, toucher)
 
 	PTSR.SetBubbleActive(special, false)
 	
+	if not PTSR.isOvertime() then
+		special.bubblerespawntics = 45*TICRATE
+	else
+		special.bubblerespawntics = 30*TICRATE
+	end
+	
 	return true
 end, MT_PT_BUBBLE)
 
-function PTSR.GetRandomBubblePower()
+function PTSR.GetRandomBubblePower(condition)
 	local powerlist = {}
 
 	for i=1, #PTSR.BubblePowers do
+		if condition then
+			if condition(PTSR.BubblePowers[i]) == false then -- if callback is false then continue
+				continue
+			end
+		end
+		
 		if not PTSR.BubblePowers[i].disable_spawn then
 			table.insert(powerlist, i)
 		end
 	end
 	
-	return powerlist[P_RandomRange(1, #powerlist)]
+	if #powerlist then
+		return powerlist[P_RandomRange(1, #powerlist)]
+	else
+		return 1
+	end
 end
 
 function PTSR.GetBubblePower(power_id)
@@ -330,6 +346,8 @@ addHook("MobjSpawn", function(bubble)
 	bubble.displaypower = P_SpawnMobj(bubble.x, bubble.y, bubble.z+24*FU, MT_PT_BUBBLEPOWER)
 	bubble.bubbleactive = true
 	
+	bubble.bubblerespawntics = 0
+	
 	local powerdef = PTSR.GetBubblePower(bubblepower_num)
 	
 	if powerdef.offset_z then
@@ -350,11 +368,25 @@ addHook("ThinkFrame", function()
 				if not (bubble and bubble.valid) then
 					table.remove(PTSR.BubbleMobjList, i)
 				else
-					if bubble.bubblerespawntics then
-						bubble.bubblerespawntics = max(0, $ - 1)
-						
-						if not bubble.bubblerespawntics then
-						
+					if bubble.bubblerespawntics and not bubble.bubbleactive then
+						if PTSR.pizzatime then
+							bubble.bubblerespawntics = max(0, $ - 1)
+							
+							if not bubble.bubblerespawntics then
+								if not PTSR.isOvertime()
+									bubble.bubblepower = PTSR.GetRandomBubblePower(function(power_def)
+										if power_def.disable_respawn then
+											return false
+										end
+									end)
+								else
+									bubble.bubblepower = PTSR.bubble_shoesid
+								end
+								
+								PTSR.SetBubbleActive(bubble, true)
+								
+								PTSR.RefreshBubbleIcon(bubble)
+							end
 						end
 					end
 				end
