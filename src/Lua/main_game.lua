@@ -220,6 +220,8 @@ PTSR.default_playervars = {
 	
 	isWinner = false, -- have they won a round (most points surviving)
 	
+	pf_immunity = 0, -- How many tics you are immune to pizzaface.
+	
 	-- Shields
 	atrraction_timer = 0,
 }

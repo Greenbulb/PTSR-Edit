@@ -67,6 +67,40 @@ PTSR.PFMaskData = {
 	}
 }
 
+-- When Pizzaface damages a shield.
+function PTSR:DoPFShieldDamage(toucher, special, disablepfstop, nosound)
+	if not toucher.player.powers[pw_invulnerability] then
+		local pointangle = R_PointToAngle2(toucher.x, toucher.y, special.x, special.y)
+		local pfspeed = FixedHypot(special.momx, special.momy)
+		local flashtime = TICRATE
+		
+		toucher.player.powers[pw_flashing] = $ + flashtime
+		
+		if toucher.player.ptsr then
+			toucher.player.ptsr.pf_immunity = $ + flashtime
+		end
+		
+		if not disablepfstop then
+			special.momx = $/2
+			special.momy = $/2
+			special.momz = $/2
+			
+			special.pfstuntime2 = $ + TICRATE
+		end
+		
+		toucher.state = S_PLAY_FALL
+		
+		P_Thrust(toucher, pointangle - ANGLE_180, pfspeed)
+		P_SetObjectMomZ(toucher, 5*FU, true)
+		
+		if not nosound then
+			S_StartSound(toucher, sfx_s1a3)
+		end
+		
+		toucher.player.powers[pw_shield] = SH_NONE
+	end
+end
+
 function PTSR:ForceShieldParry(toucher, special)
 	if not toucher.player.powers[pw_invulnerability] then
 		PTSR.DoParry(toucher, special)
@@ -77,8 +111,7 @@ function PTSR:ForceShieldParry(toucher, special)
 		if toucher.player.powers[pw_shield] & SH_FORCEHP then
 			toucher.player.powers[pw_shield] = SH_FORCE|((toucher.player.powers[pw_shield] & SH_FORCEHP) - 1)
 		else
-			toucher.player.powers[pw_shield] = SH_NONE
-			P_DoPlayerPain(toucher.player)
+			PTSR:DoPFShieldDamage(toucher, special, true, true)
 		end
 	end
 end
@@ -105,6 +138,8 @@ function PTSR:PizzaCanTag(peppino, pizza)
 	if not (peppino.player and peppino.valid and peppino.player.valid) then return false end
 
 	if peppino.player.ptsr.outofgame then return false end
+	
+	if peppino.player.ptsr.pf_immunity then return false end
 
 	if peppino.player.powers[pw_invulnerability] then return false end
 
@@ -310,6 +345,9 @@ addHook("TouchSpecial", function(special, toucher)
 		if player.powers[pw_shield] & SH_FORCE then
 			PTSR:ForceShieldParry(toucher, special)
 			return true
+		elseif player.powers[pw_shield] > 0 then
+			PTSR:DoPFShieldDamage(toucher, special)
+			return true
 		end
 	
 		if player.powers[pw_invulnerability] then
@@ -341,7 +379,9 @@ addHook("MobjCollide", function(peppino, pizza)
 	
 	if player.powers[pw_shield] & SH_FORCE then
 		PTSR:ForceShieldParry(peppino, pizza)
-		
+		return
+	elseif player.powers[pw_shield] > 0 then
+		PTSR:DoPFShieldDamage(peppino, pizza)
 		return
 	end
 	
@@ -435,6 +475,17 @@ addHook("MobjThinker", function(mobj)
 			mobj.pfstunmomentum = false
 		end
 		return
+	end
+	
+	-- Used for shields
+	if mobj.pfstuntime2 then
+		mobj.pfstuntime2 = $ - 1
+		
+		if not mobj.pfstunmomentum then
+			mobj.momx = $/2
+			mobj.momy = $/2
+			mobj.momz = $/2
+		end
 	end
 	
 	PF_FindNewPlayer(mobj)
@@ -593,6 +644,7 @@ addHook("MobjSpawn", function(mobj)
 	mobj.spriteyscale = $ / 2
 
 	mobj.pfstuntime = multiplayer and CV_PTSR.pizzatimestun.value*TICRATE or TICRATE
+	mobj.pfstuntime2 = 0
 end, MT_PIZZA_ENEMY)
 
 local function controls_angle(p)
