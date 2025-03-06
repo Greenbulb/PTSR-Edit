@@ -4,7 +4,7 @@ addHook("PlayerThink", function(player)
 	if not (player.mo and player.mo.valid) then return end
 	
 	if player.ptsr.atrraction_timer then
-		if (player.powers[pw_shield] & SH_ATTRACT) then
+		if (player.powers[pw_shield] == SH_ATTRACT) then
 			player.ptsr.atrraction_timer = max(0, $ - 1)
 			
 			if not player.ptsr.atrraction_timer then
