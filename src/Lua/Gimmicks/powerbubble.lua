@@ -179,13 +179,19 @@ PTSR:AddBubblePower({
 	name = "Attraction Shield",
 	pickup_func = function(toucher)
 		if toucher and toucher.valid and toucher.player and toucher.player.valid then
-			local player = toucher.player
+			local player = toucher.player	
 			
-			player.ptsr.atrraction_timer = $ + 10*TICRATE
-			
-			P_SwitchShield(player, SH_ATTRACT)
-			P_SpawnShieldOrb(player)
-			S_StartSound(toucher, sfx_attrsg)
+			if not (toucher.eflags & MFE_UNDERWATER) then
+				player.ptsr.atrraction_timer = $ + 10*TICRATE
+				
+				P_SwitchShield(player, SH_ATTRACT)
+				P_SpawnShieldOrb(player)
+				S_StartSound(toucher, sfx_attrsg)
+			else -- Give pity shield if underwater.
+				P_SwitchShield(player, SH_PITY)
+				P_SpawnShieldOrb(player)
+				S_StartSound(toucher, sfx_shield)
+			end
 		end
 	end,
 	sprite = SPR_TVAT,
