@@ -505,24 +505,10 @@ addHook("ThinkFrame", do
 						for i=1,#PTSR.BubbleMobjList do
 							local bubble = PTSR.BubbleMobjList[i]
 							
-							bubble.bubbleactive = true
-							bubble.state = S_PT_BUBBLE
-							bubble.displaypower.state = S_PT_BUBBLE3
+							PTSR.SetBubbleActive(bubble, true)
 							bubble.bubblepower = PTSR.bubble_shoesid
 							
-							local powerdef = PTSR.BubblePowers[bubble.bubblepower] or PTSR.BubblePowers[1] or error("No bubbledefs exist.")
-							
-							if powerdef.sprite == nil then
-								bubble.displaypower.sprite = SPR_TVRI 
-							else
-								bubble.displaypower.sprite = powerdef.sprite
-							end
-							
-							if powerdef.frame == nil then
-								bubble.displaypower.frame = C
-							else
-								bubble.displaypower.frame = powerdef.frame
-							end
+							PTSR.RefreshBubbleIcon(bubble)
 						end
 					elseif not (PTSR.aipf
 					and PTSR.aipf.valid)

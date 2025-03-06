@@ -245,9 +245,11 @@ addHook("TouchSpecial", function(special, toucher)
 	end
 	
 	if special.displaypower and special.displaypower.valid then
-		P_SpawnGhostMobj(special.displaypower)
-		--P_RemoveMobj(special.displaypower)
-		special.displaypower.state = S_INVISIBLE
+		local ghost = P_SpawnGhostMobj(special)
+		ghost.fuse = 5
+		
+		local ghost2 = P_SpawnGhostMobj(special.displaypower)
+		ghost2.fuse = 10
 	end
 	
 	if special.bubblepower and PTSR.BubblePowers[special.bubblepower] then
@@ -270,14 +272,13 @@ addHook("TouchSpecial", function(special, toucher)
 	end
 	
 	A_PT_BubbleFloatAnim(special, popcolor)
-	
-	special.bubbleactive = false
-	special.state = S_INVISIBLE
+
+	PTSR.SetBubbleActive(special, false)
 	
 	return true
 end, MT_PT_BUBBLE)
 
-addHook("MobjSpawn", function(bubble)
+function PTSR.GetRandomBubblePower()
 	local powerlist = {}
 
 	for i=1, #PTSR.BubblePowers do
@@ -286,16 +287,15 @@ addHook("MobjSpawn", function(bubble)
 		end
 	end
 	
-	bubble.bubblepower = powerlist[P_RandomRange(1, #powerlist)]
-	
-	bubble.displaypower = P_SpawnMobj(bubble.x, bubble.y, bubble.z+24*FU, MT_PT_BUBBLEPOWER)
-	bubble.bubbleactive = true
-	
-	local powerdef = PTSR.BubblePowers[bubble.bubblepower] or PTSR.BubblePowers[1] or error("No bubbledefs exist.")
-	
-	if powerdef.offset_z then
-		P_SetOrigin(bubble.displaypower, bubble.x, bubble.y, bubble.z+powerdef.offset_z)
-	end
+	return powerlist[P_RandomRange(1, #powerlist)]
+end
+
+function PTSR.GetBubblePower(power_id)
+	return PTSR.BubblePowers[power_id] or PTSR.BubblePowers[1] or error("No bubbledefs exist.")
+end
+
+function PTSR.RefreshBubbleIcon(bubble)
+	local powerdef = PTSR.GetBubblePower(bubble.bubblepower)
 	
 	if powerdef.sprite == nil then
 		bubble.displaypower.sprite = SPR_TVRI 
@@ -308,6 +308,35 @@ addHook("MobjSpawn", function(bubble)
 	else
 		bubble.displaypower.frame = powerdef.frame
 	end
+end
+
+function PTSR.SetBubbleActive(bubble, bool)
+	if bubble.displaypower and bubble.displaypower.valid then
+		if bool == true then
+			bubble.bubbleactive = true
+			bubble.state = S_PT_BUBBLE
+			bubble.displaypower.state = S_PT_BUBBLE3
+		elseif bool == false then
+			bubble.bubbleactive = false
+			bubble.state = S_INVISIBLE
+			bubble.displaypower.state = S_INVISIBLE
+		end
+	end
+end
+
+addHook("MobjSpawn", function(bubble)
+	bubble.bubblepower = PTSR.GetRandomBubblePower()
+	
+	bubble.displaypower = P_SpawnMobj(bubble.x, bubble.y, bubble.z+24*FU, MT_PT_BUBBLEPOWER)
+	bubble.bubbleactive = true
+	
+	local powerdef = PTSR.GetBubblePower(bubblepower_num)
+	
+	if powerdef.offset_z then
+		P_SetOrigin(bubble.displaypower, bubble.x, bubble.y, bubble.z+powerdef.offset_z)
+	end
+	
+	PTSR.RefreshBubbleIcon(bubble)
 	
 	PTSR.BubbleMobjList[#PTSR.BubbleMobjList + 1] = bubble
 end, MT_PT_BUBBLE)
@@ -320,6 +349,14 @@ addHook("ThinkFrame", function()
 			for i,bubble in ipairs(PTSR.BubbleMobjList) do
 				if not (bubble and bubble.valid) then
 					table.remove(PTSR.BubbleMobjList, i)
+				else
+					if bubble.bubblerespawntics then
+						bubble.bubblerespawntics = max(0, $ - 1)
+						
+						if not bubble.bubblerespawntics then
+						
+						end
+					end
 				end
 			end
 		end
