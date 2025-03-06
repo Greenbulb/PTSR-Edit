@@ -68,11 +68,12 @@ PTSR.PFMaskData = {
 }
 
 -- When Pizzaface damages a shield.
-function PTSR:DoPFShieldDamage(toucher, special, disablepfstop, nosound)
+function PTSR:DoPFShieldDamage(toucher, special, disablepfstop, nosound, disableparry)
 	if not toucher.player.powers[pw_invulnerability] then
 		local pointangle = R_PointToAngle2(toucher.x, toucher.y, special.x, special.y)
 		local pfspeed = FixedHypot(special.momx, special.momy)
 		local flashtime = TICRATE
+		local pfstoptime = TICRATE
 		
 		toucher.player.powers[pw_flashing] = $ + flashtime
 		
@@ -81,17 +82,36 @@ function PTSR:DoPFShieldDamage(toucher, special, disablepfstop, nosound)
 		end
 		
 		if not disablepfstop then
-			special.momx = $/2
-			special.momy = $/2
-			special.momz = $/2
+			if PTSR.isOvertime() then
+				pfstoptime = $ / 2
+			end
 			
-			special.pfstuntime2 = $ + TICRATE
+			special.momx = $/3
+			special.momy = $/3
+			special.momz = $/3
+			
+			special.pfstuntime2 = $ + pfstoptime
 		end
-		
+
 		toucher.state = S_PLAY_FALL
 		
-		P_Thrust(toucher, pointangle - ANGLE_180, pfspeed)
-		P_SetObjectMomZ(toucher, 5*FU, true)
+		if PTSR.isOvertime() and not disableparry then
+			nosound = true
+			
+			PTSR.DoParry(special, toucher, 3*(FU/4))
+			PTSR.DoParryAnim(special, true)
+			
+			PTSR.DoHitlag(special)
+			PTSR.DoHitlag(toucher)
+			
+			PTSR.ParryList[toucher] = {
+				time_left = PTSR.ParryStunFrames,
+				add_angle = 0,
+			}
+		else
+			P_Thrust(toucher, pointangle - ANGLE_180, pfspeed)
+			P_SetObjectMomZ(toucher, 5*FU, true)
+		end
 		
 		if not nosound then
 			S_StartSound(toucher, sfx_s1a3)
@@ -111,7 +131,7 @@ function PTSR:ForceShieldParry(toucher, special)
 		if toucher.player.powers[pw_shield] & SH_FORCEHP then
 			toucher.player.powers[pw_shield] = SH_FORCE|((toucher.player.powers[pw_shield] & SH_FORCEHP) - 1)
 		else
-			PTSR:DoPFShieldDamage(toucher, special, true, true)
+			PTSR:DoPFShieldDamage(toucher, special, true, true, true)
 		end
 	end
 end
