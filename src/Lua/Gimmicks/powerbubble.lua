@@ -180,7 +180,7 @@ PTSR:AddBubblePower({
 		if toucher and toucher.valid and toucher.player and toucher.player.valid then
 			local player = toucher.player
 			
-			player.ptsr.atrraction_timer = 10*TICRATE
+			player.ptsr.atrraction_timer = $ + 10*TICRATE
 			
 			P_SwitchShield(player, SH_ATTRACT)
 			P_SpawnShieldOrb(player)

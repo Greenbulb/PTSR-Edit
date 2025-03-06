@@ -17,7 +17,6 @@ addHook("PlayerThink", function(player)
 				end
 			end
 		else -- Clear silently cause its probably illegal.
-			player.powers[pw_shield] = 0
 			player.ptsr.atrraction_timer = 0
 		end
 	end
