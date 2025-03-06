@@ -102,7 +102,8 @@ PTSR:AddBubblePower({
 	sprite = SPR_50BI,
 	frame = A,
 	--disable_popsound = true,
-	pop_color = SKINCOLOR_ORANGE
+	pop_color = SKINCOLOR_ORANGE,
+	disable_respawn = true,
 })
 
 /*
