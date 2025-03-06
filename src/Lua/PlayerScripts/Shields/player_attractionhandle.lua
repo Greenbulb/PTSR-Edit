@@ -8,7 +8,8 @@ addHook("PlayerThink", function(player)
 			player.ptsr.atrraction_timer = max(0, $ - 1)
 			
 			if not player.ptsr.atrraction_timer then
-				player.powers[pw_shield] = 0
+				P_SwitchShield(player, SH_PITY)
+				P_SpawnShieldOrb(player)
 				S_StartSound(player.mo, sfx_s3k79)
 				P_FlashPal(player, 1, 12)
 			else
