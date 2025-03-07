@@ -74,6 +74,17 @@ addHook("PlayerThink", function(player)
 			-- player is not stunned? neat!
 			player_pf_movement(player)
 		end
+		
+		-- A bit messy putting a variable here but okay.
+		if player.mo.pfstuntime2 then
+			player.mo.pfstuntime2 = $ - 1
+			
+			if not player.mo.pfstunmomentum then
+				player.mo.momx = $/3
+				player.mo.momy = $/3
+				player.mo.momz = $/3
+			end
+		end
 
 		if player.mo.skin ~= "sonic" then
 			-- compatibility issues might occur, quick, switch back to sonic!

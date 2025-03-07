@@ -87,9 +87,9 @@ addHook("MobjThinker", function(mobj)
 		mobj.pfstuntime2 = $ - 1
 		
 		if not mobj.pfstunmomentum then
-			mobj.momx = $/2
-			mobj.momy = $/2
-			mobj.momz = $/2
+			mobj.momx = $/3
+			mobj.momy = $/3
+			mobj.momz = $/3
 		end
 	end
 	
