@@ -18,6 +18,112 @@ sfxinfo[sfx_lap2].caption = "New lap!"
 
 rawset(_G, "FUNC_PTSR", {}) -- functions
 
+rawset(_G, "PTSR", { -- variables
+	spawn_location = 
+	{x = 0, y = 0, z = 0, angle = 0}, -- where the sign is at the start of the map
+	
+	end_location = 
+	{x = 0, y = 0, z = 0, angle = 0}, -- where the sign originally was in the map placement
+	
+	pizzatime = false,
+	laps = 0,
+	quitting = false,
+	pizzatime_tics = 0,
+	titlecard_time = 0,
+	
+	maxlaps = 5,
+
+	timeleft = 0,
+	
+	timeover = false,
+	
+	endsector = nil,
+	
+	showtime = false,
+	
+	hudstuff = {
+		anim = 0,
+		anim_active = false,
+		
+		rev = false,
+		wait_tics = 0,
+		
+		stop = false,
+	},
+	
+	endscreen_tics = 0,
+	
+	endscreen_phase = 1,
+	
+	endscreen_phase_tics = 0,
+	
+	gameover_tics = 0,
+
+	gameover = false,
+	
+	deathrings = {},
+	
+	timeover_tics = 0,
+	
+	maxrankpoints = 0,
+	
+	vote_maplist = {
+		{votes = 0, mapnum = 1, gamemode = 1},
+		{votes = 0, mapnum = 1, gamemode = 1},
+		{votes = 0, mapnum = 1, gamemode = 1}
+	},
+	
+	vote_roulettelist = {
+		/*
+			{
+				[1] = {
+					mapnum = 1,
+					gamemode = 1,
+					voter_info = {
+						name = "John Doe"
+						skin = "sonic"
+						skincolor = SKINCOLOR_BLUE
+					},
+				}
+			}
+		*/
+	},
+	
+	vote_timeleft = 0,
+	
+	vote_screen = false,
+	
+	vote_roulette_tictilmapswitch = 0,
+	
+	vote_roulette_ticsleft = 0,
+	
+	vote_roulette_turnsleft = 100,
+	
+	vote_routette_selection = 1,
+	
+	vote_roulette_ticspeed = 50,
+	
+	vote_routette_ticspeed_turnsleft = 7,
+	
+	vote_routette_ticspeed_turnsleft_start = 7, -- long ass name brah
+	
+	vote_finalpick = nil,
+	
+	nextmapvoted = 0,
+	
+	nextmapvoted_info = {},
+	
+	dustdeviltimer = 0, -- when this reaches a certain number, every pizza face spawns an alive dust devil
+	
+	gamemode = 1,
+	
+	nextgamemode = 1,
+
+	pizzas = {},
+	
+	BubbleMobjList = {},
+})
+
 freeslot("MT_PIZZAMASK", "S_PIZZAFACE", "S_CONEBALL", "S_PF_EGGMAN", "S_SUMMADAT_PF", "SPR_PZAT", "SPR_CONB", "SPR_SMAD", "sfx_smdah", "S_GOOCH_PF", "SPR_PZAD")
 freeslot("sfx_nrmlfc","S_NORMALFACE_PF","SPR_NMFC")
 freeslot("S_KIMIZZA_PF", "SPR_KMZA")
@@ -89,13 +195,14 @@ states[S_GOOCH_PF] = {
     nextstate = S_GOOCH_PF
 }
 
---this is UGLY.
-dofile "SaxAnimation/Init.lua"
-dofile "SaxAnimation/UpdatePerFrame.lua"
-
+dofile "Libraries/require.lua"
 dofile "Libraries/customhudlib.lua"
 
 dofile "Libraries/hooksystem.lua"
+
+--this is UGLY.
+dofile "SaxAnimation/Init.lua"
+dofile "SaxAnimation/UpdatePerFrame.lua"
 
 dofile "Libraries/sglib"
 
@@ -141,7 +248,10 @@ dofile "PlayerScripts/player_scorehud"
 dofile "Libraries/libs.lua"
 dofile "exit_handle.lua"
 dofile "Hooks/music_handle.lua"
-dofile "pizzaface.lua"
+
+dofile "Pizzaface/Functions/_init"
+dofile "Pizzaface/AI/_init"
+dofile "Pizzaface/PlayerPF/_init"
 
 dofile "HUD/name_tags.lua"
 

@@ -94,10 +94,10 @@ COM_AddCommand("ptsr_spawnpfai", function(player, randomplayer, pftype)
 		return
 	end
 	
-	local newpizaface = PTSR:SpawnPFAI(pftype)
+	local newpizaface = PTSR.pfSpawnAI(pftype)
 	
 	if (randomplayer and not randomplayer == "false") then
-		PTSR:RNGPizzaTP(newpizaface, true)
+		PTSR.pfRandomTP(newpizaface, true)
 	end
 	
 	CONS_Printf(player, "Spawned an AI Pizzaface")

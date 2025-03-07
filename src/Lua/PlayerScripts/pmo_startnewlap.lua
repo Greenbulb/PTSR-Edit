@@ -6,7 +6,7 @@ PTSR.StartNewLap = function(mobj)
 
 		S_StartSound(nil, sfx_lap2, player)
 		if not multiplayer and PTSR.aipf then
-			PTSR:SpawnPFAI()
+			PTSR.pfSpawnAI()
 		end
 		
 		player.ptsr.laptime = 0
