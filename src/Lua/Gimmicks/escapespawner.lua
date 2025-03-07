@@ -199,7 +199,9 @@ addHook("ThinkFrame", function()
 	
 	local count = PTSR_COUNT()
 
-	local cyclesleft = 8 + (42/count.peppinos)
+	if not count.peppinos then return end 
+
+	local cyclesleft = 8 + (42/(count.peppinos or 1))
 	
 	if serversided then
 		cyclesleft = 5
