@@ -29,7 +29,7 @@ function PTSR.pfDoShieldDamage(toucher, special, disablepfstop, nosound, disable
 		if PTSR.isOvertime() and not disableparry then
 			nosound = true
 			
-			PTSR.DoParry(special, toucher, 3*(FU/4))
+			PTSR.DoParry(special, toucher, (FU) + (FU/2))
 			PTSR.DoParryAnim(special, true)
 			
 			PTSR.DoHitlag(special)
@@ -40,7 +40,7 @@ function PTSR.pfDoShieldDamage(toucher, special, disablepfstop, nosound, disable
 				add_angle = 0,
 			}
 		else
-			P_Thrust(toucher, pointangle - ANGLE_180, pfspeed)
+			P_Thrust(toucher, pointangle - ANGLE_180, pfspeed*2)
 			P_SetObjectMomZ(toucher, 5*FU, true)
 		end
 		
