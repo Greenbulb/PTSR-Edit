@@ -19,9 +19,6 @@ local minimal_score = function(v, player)
 	local rings_icon = v.cachePatch("NRNG1")
 	v.draw(general_pos.x, general_pos.y+20, rings_icon, flags)
 	v.drawString(general_pos.x+35, general_pos.y+25, rings, flags, string_flags)
-	if hud.enabled("rings")
-		hud.disable("rings")
-	end
 end
 
 return "Score", minimal_score, "game", "minimal"

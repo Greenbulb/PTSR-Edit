@@ -17,10 +17,6 @@ local minimal_lives = function(v, player)
 			v.drawScaled(char_icon.x, char_icon.y, FixedMul(FU, skins[player.mo.skin].highresscale), life_icon, char_icon.flags,skin_color)
 		end
 	end
-	
-	if hud.enabled("lives")
-		hud.disable("lives")
-	end
 end
 
 return "Lives", minimal_lives, "game", "minimal"

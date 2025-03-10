@@ -64,4 +64,4 @@ local function combo_hud(v, player)
 	end
 end
 
-return "Combo", minim_combo_offsets, "game", "minimal"
+return "Combo", combo_hud, "game", "minimal"

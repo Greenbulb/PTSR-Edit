@@ -128,8 +128,10 @@ addHook("HUD", function(v,p,c)
 		
 		if PTSR.hud_style == "minimal" then
 			hud.disable("rings")
+			hud.disable("lives")
 		else
 			hud.enable("rings")
+			hud.enable("lives")
 		end
 	end
 end)
@@ -145,15 +147,6 @@ SetupHud "Gamemode"
 SetupHud "OvertimeMultiplier"
 SetupHud "UntilEnd"
 
--- Hardcoded. (And has the legacy prefix)
-dofile "HUD/intermission/drawVoteScreenChosenMap.lua"
-dofile "HUD/intermission/drawVoteScreenRoulette.lua"
-dofile "HUD/intermission/drawVoteScreenMaps.lua"
-dofile "HUD/intermission/drawVoteScreenTimer.lua"
-dofile "HUD/intermission/draw_p_rank_animation.lua"
-dofile "HUD/intermission/drawBackground.lua"
-dofile "HUD/intermission/main.lua"
-
 -- Minimal Hud Setup --
 path = "HUD/Drawers/minimal";
 
@@ -163,9 +156,19 @@ SetupHud "Lapping"
 SetupHud "Rank"
 SetupHud "PlayerPF"
 SetupHud "OvertimeMultiplier"
+SetupHud "Lives"
 
 path = "HUD/Drawers/default";
 -- Minimal Hud Setup End --
+
+-- Hardcoded. (And has the legacy prefix)
+dofile "HUD/intermission/drawVoteScreenChosenMap.lua"
+dofile "HUD/intermission/drawVoteScreenRoulette.lua"
+dofile "HUD/intermission/drawVoteScreenMaps.lua"
+dofile "HUD/intermission/drawVoteScreenTimer.lua"
+dofile "HUD/intermission/draw_p_rank_animation.lua"
+dofile "HUD/intermission/drawBackground.lua"
+dofile "HUD/intermission/main.lua"
 
 SetupHud "Combo"
 SetupHud "Overtime"
