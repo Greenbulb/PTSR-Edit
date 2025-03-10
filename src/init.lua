@@ -124,6 +124,11 @@ rawset(_G, "PTSR", { -- variables
 	BubbleMobjList = {},
 })
 
+PTSR.HUD = {
+	default = {};
+	minimal = {};
+}
+
 freeslot("MT_PIZZAMASK", "S_PIZZAFACE", "S_CONEBALL", "S_PF_EGGMAN", "S_SUMMADAT_PF", "SPR_PZAT", "SPR_CONB", "SPR_SMAD", "sfx_smdah", "S_GOOCH_PF", "SPR_PZAD")
 freeslot("sfx_nrmlfc","S_NORMALFACE_PF","SPR_NMFC")
 freeslot("S_KIMIZZA_PF", "SPR_KMZA")

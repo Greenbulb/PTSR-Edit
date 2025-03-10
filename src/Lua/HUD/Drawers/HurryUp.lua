@@ -39,4 +39,4 @@ local hurryup_hud = function(v, player)
 	customhud.CustomFontString(v, x, y, timestring, "PTFNT", V_SNAPTOLEFT, "center", FRACUNIT, SKINCOLOR_WHITE)
 end
 
-customhud.SetupItem("PTSR_hurryup", ptsr_hudmodname, hurryup_hud, "game", 0)
+return "HurryUp", hurryup_hud

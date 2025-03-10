@@ -7,4 +7,4 @@ local untilend_hud = function(v, player)
 	v.drawString(160, 60, text_timeundilend, V_SNAPTOTOP|V_30TRANS|V_ADD, "thin-center")
 end
 
-customhud.SetupItem("PTSR_untilend", ptsr_hudmodname, untilend_hud, "game", 0)
+return "UntilEnd", untilend_hud

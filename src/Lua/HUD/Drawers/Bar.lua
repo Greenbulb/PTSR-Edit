@@ -254,4 +254,4 @@ local bar_hud = function(v, player)
 	end
 end
 
-customhud.SetupItem("PTSR_bar", ptsr_hudmodname, bar_hud, "game", 0)
+return "Bar", bar_hud

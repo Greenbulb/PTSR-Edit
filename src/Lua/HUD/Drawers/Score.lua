@@ -269,4 +269,4 @@ local score_hud = function(v, player)
 	end
 end
 
-customhud.SetupItem("score", ptsr_hudmodname, score_hud, "game", 0) -- override score hud
+return "Score", score_hud

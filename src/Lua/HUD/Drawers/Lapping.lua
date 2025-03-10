@@ -76,5 +76,4 @@ local lap_hud = function(v, player)
 	end
 end
 
-
-customhud.SetupItem("PTSR_lap", ptsr_hudmodname, lap_hud, "game", 0)
+return "Lapping", lap_hud

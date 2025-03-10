@@ -56,4 +56,4 @@ local overtimemulti_hud = function(v, player)
 	v.drawString(x, y, text..speedtext.."X", V_SNAPTOTOP|V_SNAPTOLEFT|V_REDMAP|V_20TRANS, "thin-fixed")
 end
 
-customhud.SetupItem("PTSR_overtimemulti", ptsr_hudmodname, overtimemulti_hud, "game", 0)
+return "OvertimeMultiplier", overtimemulti_hud

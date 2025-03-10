@@ -6,4 +6,4 @@ local faceswap_hud = function(v, player)
 	end
 end
 
-customhud.SetupItem("PTSR_faceswap", ptsr_hudmodname, faceswap_hud, "game", 0)
+return "PlayerPFSwap", faceswap_hud

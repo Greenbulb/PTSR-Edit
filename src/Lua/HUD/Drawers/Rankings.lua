@@ -175,4 +175,4 @@ local scoreboard_hud = function(v, player)
 	customhud.CustomFontString(v, zinger_x, zinger_y, zinger_text, "PTFNT", (V_SNAPTOTOP), "center", FU/4, SKINCOLOR_BLUE)
 end
 
-customhud.SetupItem("rankings", ptsr_hudmodname, scoreboard_hud, "scores", 1) -- override vanilla rankings hud
+return "Rankings", scoreboard_hud, "scores"

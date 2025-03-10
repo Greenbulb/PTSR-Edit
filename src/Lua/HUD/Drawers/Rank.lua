@@ -59,4 +59,4 @@ local rank_hud = function(v, player)
 	end
 end
 
-customhud.SetupItem("PTSR_rank", ptsr_hudmodname, rank_hud, "game", 0)
+return "Rank", rank_hud

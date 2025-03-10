@@ -42,4 +42,4 @@ local pfviewpoint_hud = function(v, p)
     end
 end
 
-customhud.SetupItem("PTSR_pfviewpoint", ptsr_hudmodname, pfviewpoint_hud, "game", 0)
+return "PFViewPoint", pfviewpoint_hud

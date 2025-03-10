@@ -54,4 +54,4 @@ local overtime_hud = function(v, player)
 	v.fadeScreen(SKINCOLOR_CRIMSON, ease.linear(t, 10, 0))
 end
 
-customhud.SetupItem("PTSR_overtime", ptsr_hudmodname, overtime_hud, "game", 0)
+return "Overtime", overtime_hud

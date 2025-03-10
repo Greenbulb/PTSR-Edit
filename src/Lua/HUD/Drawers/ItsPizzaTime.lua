@@ -26,4 +26,4 @@ local itspizzatime_hud = function(v, player)
 	end
 end
 
-customhud.SetupItem("PTSR_itspizzatime", ptsr_hudmodname, itspizzatime_hud, "game", 0)
+return "ItsPizzaTime", itspizzatime_hud

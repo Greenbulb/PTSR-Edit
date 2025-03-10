@@ -99,4 +99,4 @@ local combo_hud = function(v, player)
 	end
 end
 
-customhud.SetupItem("PTSR_combo", ptsr_hudmodname, combo_hud, "game", 0)
+return "Combo", combo_hud

@@ -104,4 +104,4 @@ local tooltips_hud = function(v, player)
 	end
 end
 
-customhud.SetupItem("PTSR_tooltips", ptsr_hudmodname, tooltips_hud, "game", 0)
+return "Tooltips", tooltips_hud

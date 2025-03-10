@@ -6,28 +6,39 @@ function PTSR.isHudStyle(style)
 	return PTSR.hud_style == style
 end
 
-local function SetupHud(filename)
-	local funcname, drawfunc, type, style, hudlayer = dofile(path.."/"..filename)
+function PTSR.SetupHud(filepath)
+	local funcname, drawfunc, type, style, hudlayer = dofile(filepath)
 	local hudstyle = (style or "default")
 	
 	-- Make a new function from the current function.
 	-- Currently makes it so huds don't draw if it's not PTSR.
 	-- And makes it so it only draws the current style
-	local new_drawfunc = function(v, player)
-		if gametype ~= GT_PTSPICER then return end
-		if not PTSR.isHudStyle(hudstyle) then return end
+	
+	if drawfunc then
+		local new_drawfunc = function(v, player)
+			if gametype ~= GT_PTSPICER then return end
+			if not PTSR.isHudStyle(hudstyle) then return end
+			
+			drawfunc(v, player)
+		end
 		
-		drawfunc(v, player)
+		if PTSR.HUD[hudstyle] == nil then
+			PTSR.HUD[hudstyle] = {}
+		end
+		
+		PTSR.HUD[hudstyle][funcname] = {draw = new_drawfunc, draw_type = type, draw_layer = hudlayer, draw_style = hudstyle}
+		
+		customhud.SetupItem(
+			"PTSR:"..string.upper(funcname), 
+			ptsr_hudmodname, PTSR.HUD[hudstyle][funcname].draw, 
+			PTSR.HUD[hudstyle][funcname].draw_type or "game", 
+			PTSR.HUD[hudstyle][funcname].draw_layer or 0
+		)
 	end
-	
-	ZE2.HUD[hudstyle][funcname] = {draw = new_drawfunc, draw_type = type, draw_layer = hudlayer, draw_style = hudstyle}
-	
-	customhud.SetupItem(
-		"PTSR:"..string.upper(funcname), 
-		ptsr_hudmodname, PTSR.HUD[hudstyle][funcname].draw, 
-		PTSR.HUD[hudstyle][funcname].draw_type or "game", 
-		PTSR.HUD[hudstyle][funcname].draw_layer or 0
-	)
+end
+
+local function SetupHud(filename)
+	PTSR.SetupHud(path.."/"..filename)
 end
 
 rawset(_G, "ptsr_hudmodname", "spicerunners")
@@ -38,6 +49,10 @@ rawset(_G, "pthud_start_pos", 225*FRACUNIT)
 -- pt animation position end
 rawset(_G, "pthud_finish_pos", 175*FRACUNIT)
 
+-- Remove vanilla crap.
+customhud.SetupItem("score", ptsr_hudmodname, nil, "game", 0)
+customhud.SetupItem("time", ptsr_hudmodname, nil, "game", 0)
+customhud.SetupItem("rankings", ptsr_hudmodname, nil, "scores", 0)
 
 -- rank to patch
 PTSR.r2p = function(v,rank) 
@@ -83,7 +98,6 @@ SetupHud "Combo"
 SetupHud "Overtime"
 SetupHud "Rankings"
 SetupHud "Score"
-SetupHud "Time"
 SetupHud "HurryUp"
 SetupHud "PFViewpoint"
 
