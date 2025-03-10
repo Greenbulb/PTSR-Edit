@@ -218,8 +218,6 @@ PTSR.bubble_flameshieldid = PTSR:AddBubblePower({
 	disable_spawn = true
 })
 
-
-
 PTSR.bubble_shoesid = PTSR:AddBubblePower({
 	name = "Speed Shoes",
 	pickup_func = function(toucher)
