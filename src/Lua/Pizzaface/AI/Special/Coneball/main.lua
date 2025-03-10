@@ -1,10 +1,21 @@
 freeslot("MT_CONEBALL_HAIL", "S_CONEBALL_HAIL", "S_CONEBALL_HAIL_LAND", "S_CONEBALL_PARTICLE")
 
+freeslot(
+	"SPR_CONEBALL_ATTACK",
+	"SPR_CONEBALL_COOKIE", -- Default animation.
+	"SPR_CONEBALL_DETRANSFORM",
+	"SPR_CONEBALL_PINK",
+	"SPR_CONEBALL_PROJECTILE_A",
+	"SPR_CONEBALL_PROJECTILE_B",
+	"SPR_CONEBALL_PROJECTILE_C",
+	"SPR_CONEBALL_TRANSFORM"
+)
+
 states[S_CONEBALL] = {
-    sprite = SPR_CONB,
+    sprite = SPR_CONEBALL_COOKIE,
     frame = FF_ANIMATE|FF_FULLBRIGHT|A,
     tics = -1,
-    var1 = P,
+    var1 = 15,
     var2 = 2,
     nextstate = S_CONEBALL
 }
@@ -18,22 +29,22 @@ mobjinfo[MT_CONEBALL_HAIL] = {
 	flags = MF_NOCLIP|MF_NOCLIPHEIGHT|MF_SPECIAL
 }
 states[S_CONEBALL_HAIL] = {
-    sprite = SPR_CONB,
-    frame = FF_ANIMATE|Y,
+    sprite = SPR_CONEBALL_PROJECTILE_A,
+    frame = FF_ANIMATE|A,
     tics = -1,
     var1 = 5,
     var2 = 2,
     nextstate = S_CONEBALL_HAIL
 }
 states[S_CONEBALL_HAIL_LAND] = {
-    sprite = SPR_CONB,
-    frame = Z+1+4,
+    sprite = SPR_CONEBALL_PROJECTILE_B,
+    frame = A,
     tics = -1,
     nextstate = S_CONEBALL_HAIL_LAND
 }
 states[S_CONEBALL_PARTICLE] = {
-    sprite = SPR_CONB,
-    frame = Z+11+G, -- lowercase g frame
+    sprite = SPR_CONEBALL_PROJECTILE_C,
+    frame = A,
     tics = TICRATE,
     nextstate = S_NULL
 }
@@ -42,32 +53,32 @@ local STABSPEED = 1
 
 freeslot("SPR_CONA", "S_CONEBALL_PINK", "S_CONEBALL_TRANSFORM", "S_CONEBALL_ATTACK", "S_CONEBALL_DETRANSFORM")
 states[S_CONEBALL_TRANSFORM] = {
-    sprite = SPR_CONB,
-    frame = FF_ANIMATE|FF_FULLBRIGHT|(Z+1+5),
+    sprite = SPR_CONEBALL_TRANSFORM,
+    frame = FF_ANIMATE|FF_FULLBRIGHT|A,
     tics = 21,
     var1 = 10,
     var2 = 2,
     nextstate = S_CONEBALL_PINK
 }
 states[S_CONEBALL_PINK] = {
-    sprite = SPR_CONB,
-    frame = FF_ANIMATE|FF_FULLBRIGHT|Q,
+    sprite = SPR_CONEBALL_PINK,
+    frame = FF_ANIMATE|FF_FULLBRIGHT|A,
     tics = -1,
     var1 = 7,
     var2 = 2,
     nextstate = S_CONEBALL_PINK
 }
 states[S_CONEBALL_ATTACK] = {
-    sprite = SPR_CONA,
+    sprite = SPR_CONEBALL_ATTACK,
     frame = FF_ANIMATE|FF_FULLBRIGHT|A,
     tics = 26*STABSPEED,
-    var1 = Z+1,
+    var1 = 25,
     var2 = STABSPEED,
     nextstate = S_CONEBALL
 }
 states[S_CONEBALL_DETRANSFORM] = {
-    sprite = SPR_CONA,
-    frame = FF_ANIMATE|FF_FULLBRIGHT|(Z+2),
+    sprite = SPR_CONEBALL_DETRANSFORM,
+    frame = FF_ANIMATE|FF_FULLBRIGHT|A,
     tics = 18,
     var1 = 9,
     var2 = 2,
@@ -433,7 +444,7 @@ local hudf = function (v, p)
     end
     if not #dots then return end
     for _,dot in ipairs(dots) do
-        local dotpatch = vv.getSpritePatch(SPR_CONB, Z+11+G, 0, dot.a)
+        local dotpatch = vv.getSpritePatch(SPR_CONEBALL_PROJECTILE_C, A, 0, dot.a)
         local dist = R_PointToDist2(dot.x, dot.y, 160*FU, 100*FU)
         local flags = 0
         if dist < 40*FU then
@@ -443,7 +454,10 @@ local hudf = function (v, p)
         elseif dist < 110*FU then
             flags = V_20TRANS
         end
-        vv.drawScaled(dot.x, dot.y, FU, dotpatch, flags)
+		
+		if dotpatch and dotpatch.valid then
+			vv.drawScaled(dot.x, dot.y, FU, dotpatch, flags)
+		end
     end
 end
 customhud.SetupItem("PTSR_coneball_icecream", ptsr_hudmodname, hudf, "game", 3)
