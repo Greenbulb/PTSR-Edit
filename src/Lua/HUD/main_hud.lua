@@ -1,6 +1,6 @@
-local path = "HUD/Drawers"
+local path = "HUD/Drawers/default"
 
-PTSR.hud_style = "default"
+PTSR.hud_style = "minimal"
 
 function PTSR.isHudStyle(style)
 	return PTSR.hud_style == style
@@ -9,15 +9,21 @@ end
 function PTSR.SetupHud(filepath)
 	local funcname, drawfunc, type, style, hudlayer = dofile(filepath)
 	local hudstyle = (style or "default")
+	local hudtype = (type or "game")
 	
 	-- Make a new function from the current function.
 	-- Currently makes it so huds don't draw if it's not PTSR.
 	-- And makes it so it only draws the current style
 	
-	if drawfunc then
+	if drawfunc and funcname then
 		local new_drawfunc = function(v, player)
-			if gametype ~= GT_PTSPICER then return end
-			if not PTSR.isHudStyle(hudstyle) then return end
+			if gametype ~= GT_PTSPICER then 
+				return 
+			end
+			
+			if not PTSR.isHudStyle(hudstyle) and hudtype == "game" then 
+				return
+			end
 			
 			drawfunc(v, player)
 		end
@@ -29,7 +35,7 @@ function PTSR.SetupHud(filepath)
 		PTSR.HUD[hudstyle][funcname] = {draw = new_drawfunc, draw_type = type, draw_layer = hudlayer, draw_style = hudstyle}
 		
 		customhud.SetupItem(
-			"PTSR:"..string.upper(funcname), 
+			"PTSR:"..string.upper(hudstyle)..":"..string.upper(funcname), -- String Example: "PTSR:DEFAULT:BAR"
 			ptsr_hudmodname, PTSR.HUD[hudstyle][funcname].draw, 
 			PTSR.HUD[hudstyle][funcname].draw_type or "game", 
 			PTSR.HUD[hudstyle][funcname].draw_layer or 0
@@ -39,6 +45,24 @@ end
 
 local function SetupHud(filename)
 	PTSR.SetupHud(path.."/"..filename)
+end
+
+local function FillMissingHudElements(style)
+	if PTSR.HUD[style] then
+		for funcname,v in pairs(PTSR.HUD["default"]) do
+			if not PTSR.HUD[style][funcname] then
+				--print("CCC: "..funcname) --DEBUG
+				PTSR.HUD[style][funcname] = PTSR.HUD["default"][funcname]
+				
+				customhud.SetupItem(
+					"PTSR:"..string.upper(style)..":"..string.upper(funcname),
+					ptsr_hudmodname, PTSR.HUD[style][funcname].draw, 
+					PTSR.HUD[style][funcname].draw_type or "game", 
+					PTSR.HUD[style][funcname].draw_layer or 0
+				)
+			end
+		end
+	end
 end
 
 rawset(_G, "ptsr_hudmodname", "spicerunners")
@@ -94,6 +118,19 @@ dofile "HUD/intermission/draw_p_rank_animation.lua"
 dofile "HUD/intermission/drawBackground.lua"
 dofile "HUD/intermission/main.lua"
 
+-- Minimal Hud Setup --
+path = "HUD/Drawers/minimal";
+
+SetupHud "Bar"
+SetupHud "Tooltips"
+SetupHud "Lapping"
+SetupHud "Rank"
+SetupHud "PlayerPF"
+SetupHud "OvertimeMultiplier"
+
+path = "HUD/Drawers/default";
+-- Minimal Hud Setup End --
+
 SetupHud "Combo"
 SetupHud "Overtime"
 SetupHud "Rankings"
@@ -101,3 +138,14 @@ SetupHud "Score"
 SetupHud "HurryUp"
 SetupHud "PFViewpoint"
 
+-- Minimal Hud Setup --
+
+path = "HUD/Drawers/minimal";
+
+SetupHud "Combo"
+SetupHud "Score" -- And rings
+
+path = "HUD/Drawers/default";
+-- Minimal Hud Setup End --
+
+FillMissingHudElements("minimal")
