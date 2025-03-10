@@ -188,9 +188,13 @@ addHook("MobjThinker", function(mobj)
 			L_SpeedCap(mobj, sped)
 		else
 			--WAAITTTTTTTTT!!!!!!!! If we're already really close to our target, don't move at all!
-			if dist < speed
-				speed = dist
+			
+			if mobj.pfstuntime2 then
+				if dist < speed then
+					speed = dist
+				end
 			end
+			
 			P_FlyTo(mobj, tx, ty, tz, speed, true)
 		end
 		
