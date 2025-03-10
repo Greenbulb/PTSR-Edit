@@ -402,6 +402,10 @@ addHook("ThinkFrame", do
 							PTSR.SetBubbleActive(bubble, true)
 							bubble.bubblepower = PTSR.bubble_shoesid
 							
+							if P_RandomChance(FU/4) then
+								bubble.bubblepower = PTSR.bubble_flameshieldid
+							end
+							
 							PTSR.RefreshBubbleIcon(bubble)
 							
 							bubble.bubblerespawntics = 0

@@ -200,6 +200,25 @@ PTSR:AddBubblePower({
 	pop_color = SKINCOLOR_YELLOW
 })
 
+PTSR.bubble_flameshieldid = PTSR:AddBubblePower({
+	name = "Flame Shield",
+	pickup_func = function(toucher)
+		if toucher and toucher.valid and toucher.player and toucher.player.valid then
+			local player = toucher.player
+			
+			P_SwitchShield(player, SH_FLAMEAURA)
+			P_SpawnShieldOrb(player)
+			S_StartSound(toucher, sfx_s3k3e)
+		end
+	end,
+	sprite = SPR_TVFL,
+	frame = C,
+	--disable_popsound = true,
+	pop_color = SKINCOLOR_CRIMSON,
+	disable_spawn = true
+})
+
+
 
 PTSR.bubble_shoesid = PTSR:AddBubblePower({
 	name = "Speed Shoes",
