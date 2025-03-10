@@ -147,15 +147,6 @@ states[S_PIZZAFACE] = {
     nextstate = S_PIZZAFACE
 }
 
-states[S_CONEBALL] = {
-    sprite = SPR_CONB,
-    frame = FF_ANIMATE|FF_FULLBRIGHT|A,
-    tics = -1,
-    var1 = H,
-    var2 = 2,
-    nextstate = S_CONEBALL
-}
-
 states[S_PF_EGGMAN] = {
     sprite = SPR_EGGM,
     frame = FF_FULLBRIGHT|A,
@@ -249,10 +240,6 @@ dofile "Libraries/libs.lua"
 dofile "exit_handle.lua"
 dofile "Hooks/music_handle.lua"
 
-dofile "Pizzaface/Functions/_init"
-dofile "Pizzaface/AI/_init"
-dofile "Pizzaface/PlayerPF/_init"
-
 dofile "HUD/name_tags.lua"
 
 dofile "HUD/main_hud.lua"
@@ -282,6 +269,10 @@ dofile "HUD/hud_score.lua"
 dofile "HUD/hud_time.lua"
 dofile "HUD/hud_hurryup.lua"
 dofile "HUD/hud_pfviewpoint.lua"
+
+dofile "Pizzaface/Functions/_init"
+dofile "Pizzaface/AI/_init"
+dofile "Pizzaface/PlayerPF/_init"
 
 dofile "discord_botleaderboard.lua"
 

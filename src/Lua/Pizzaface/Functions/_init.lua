@@ -10,6 +10,7 @@ local files = {
 	"ForceShieldParry",
 	"RandomTP",
 	"SpawnAI",
+	"AITryDamage",
 }
 
 for i,v in ipairs(files) do

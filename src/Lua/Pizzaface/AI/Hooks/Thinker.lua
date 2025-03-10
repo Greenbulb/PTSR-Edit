@@ -59,7 +59,9 @@ addHook("MobjThinker", function(mobj)
 
 	if not PTSR.pizzatime then return end
 	
-	PTSR_DoHook("pfprestunthink", mobj)
+	if PTSR_DoHook("pfprestunthink", mobj) then
+		return
+	end
 	
 	if mobj.pfstuntime then
 		mobj.pfstuntime = $ - 1
@@ -94,7 +96,9 @@ addHook("MobjThinker", function(mobj)
 	end
 	
 	PTSR.pfFindPlayer(mobj)
-	PTSR_DoHook("pfthink", mobj)
+	if PTSR_DoHook("pfthink", mobj) then
+		return
+	end
 	
 	if mobj.pizza_target and mobj.pizza_target.valid and mobj.pizza_target.health and mobj.pizza_target.player and mobj.pizza_target.player.valid and
 	PTSR.pfCanChase(mobj.pizza_target.player) then
@@ -140,6 +144,10 @@ addHook("MobjThinker", function(mobj)
 			local newspeed = gm_metadata.pfspeedmulti
 			
 			speed = FixedMul($, newspeed)
+		end
+		
+		if mobj.pfspeedmulti then -- for hooks
+			speed = FixedMul($, mobj.pfspeedmulti)
 		end
 		
 		local val = CV_PTSR.aileash.value

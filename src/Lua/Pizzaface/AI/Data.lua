@@ -17,7 +17,8 @@ PTSR.PFMaskData = {
 		sound = sfx_coneba,
 		emoji = ":candy:",
 		aiselectable = true,
-		tagcolor = SKINCOLOR_MAGENTA
+		tagcolor = SKINCOLOR_MAGENTA,
+		special = "coneball"
 	},
 	{
 		name = "Summa",
