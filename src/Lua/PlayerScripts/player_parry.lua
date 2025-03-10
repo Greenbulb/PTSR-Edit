@@ -10,6 +10,29 @@ PTSR.HitlagList = {
 
 }
 
+freeslot("MT_INSTAPARRY", "S_INSTAPARRY", "SPR_INSTAPARRY")
+
+mobjinfo[MT_INSTAPARRY] = {
+	doomednum = -1,
+	spawnstate = S_INSTAPARRY,
+
+	radius = 16*FU,
+	height = 24*FU,
+
+	dispoffset = 2,
+	
+	flags = MF_SLIDEME|MF_NOGRAVITY|MF_NOCLIPHEIGHT|MF_NOBLOCKMAP,
+}
+
+states[S_INSTAPARRY] = {
+	sprite = SPR_INSTAPARRY,
+	frame = FF_ANIMATE|A,
+	tics = 7+1,
+	var1 = 7,
+	var2 = 1,
+	nextstate = S_NULL
+}
+
 -- helper function so we can get whose pizzaface easily
 local function _isPF(mobj)
 	if not mobj and mobj.valid then
@@ -166,20 +189,28 @@ mobjinfo[freeslot "MT_PTSR_LOSSRING"] = {
 	flags = MF_NOCLIP|MF_NOCLIPHEIGHT
 }
 
-addHook("MobjThinker", function(mo)
-	if not (mo and mo.valid) then return end
-	local speed = mo.throwspeed or 16*FU
+addHook("MobjThinker", function(mobj)
+	if not (mobj and mobj.valid) then return end
+	local speed = mobj.throwspeed or 16*FU
 
-	mo.momx = FixedMul(speed, cos(mo.angle))
-	mo.momy = FixedMul(speed, sin(mo.angle))
-	mo.frame = $|FF_TRANS40
+	mobj.momx = FixedMul(speed, cos(mobj.angle))
+	mobj.momy = FixedMul(speed, sin(mobj.angle))
+	mobj.frame = $|FF_TRANS40
 
-	if mo.z > mo.ceilingz
-	or mo.z+mo.height < mo.floorz then
-		P_RemoveMobj(mo)
+	if mobj.z > mobj.ceilingz
+	or mobj.z+mobj.height < mobj.floorz then
+		P_RemoveMobj(mobj)
 		return
 	end
 end, MT_PTSR_LOSSRING)
+
+addHook("MobjThinker", function(mobj)
+	if not (mobj and mobj.valid) then return end
+	if not (mobj.target and mobj.target.valid) then return end
+	local target = mobj.target
+	
+	P_MoveOrigin(mobj, target.x, target.y, target.z - 4*FU)
+end, MT_INSTAPARRY)
 
 PTSR.DoParryAnim = function(mobj, withsound, ringloss)
 	local parry = P_SpawnMobj(mobj.x, mobj.y, mobj.z, MT_PT_PARRY)
@@ -311,17 +342,15 @@ addHook("PlayerThink", function(player)
 		if cmd.buttons & BT_ATTACK
 		and can_parry then
 			if not player.mo.pre_parry then -- pre parry start
-				local failparrysfx = {
-					sfx_prepr1,
-					sfx_prepr2,
-					sfx_prepr3
-				}
-				
 				local friendlyfire = (CV_PTSR.parry_friendlyfire.value or gm_metadata.parry_friendlyfire)
 				local gotapf = false
 				local gotanobject = false
 				local range = 1000*FU
 				local real_range = CV_PTSR.parry_radius.value
+				
+				local insta = P_SpawnMobj(player.mo.x, player.mo.y, player.mo.z - 4*FU, MT_INSTAPARRY)
+				insta.target = player.mo
+				S_StartSound(player.mo, sfx_s3k42)
 				
 				searchBlockmap("objects", function(refmobj, foundmobj)
 					if R_PointToDist2(foundmobj.x, foundmobj.y, pmo.x, pmo.y) < real_range 
@@ -396,6 +425,8 @@ addHook("PlayerThink", function(player)
 							PTSR.DoHitlag(player.mo)
 							PTSR.DoHitlag(foundmobj)
 							
+							S_StopSoundByID(player.mo, sfx_s3k42)
+							
 							gotanobject = true
 						end
 					end
@@ -403,13 +434,8 @@ addHook("PlayerThink", function(player)
 				player.mo,
 				player.mo.x-range, player.mo.x+range,
 				player.mo.y-range, player.mo.y+range)
-
+				
 				if not gotanobject then
-					S_StartSound(player.mo, failparrysfx[P_RandomRange(1,3)])
-					local tryparry = P_SpawnGhostMobj(player.mo)
-					tryparry.color = SKINCOLOR_WHITE
-					tryparry.fuse = 2
-					P_SetScale(tryparry, (3*FRACUNIT)/2)
 					player.ptsr.lastparryframe = leveltime
 					player.mo.ptsr.parry_cooldown = CV_PTSR.parrycooldown.value
 				end
