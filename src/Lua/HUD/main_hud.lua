@@ -1,6 +1,14 @@
 local path = "HUD/Drawers/default"
 
-PTSR.hud_style = "minimal"
+PTSR.hud_style = "default"
+
+local hudstyle_file = io.openlocal("client/SpiceRunners/hudstyle.txt", "r")
+
+if hudstyle_file then
+	local value = hudstyle_file:read("*l")
+	
+	PTSR.hud_style = value
+end
 
 function PTSR.isHudStyle(style)
 	return PTSR.hud_style == style
@@ -73,10 +81,28 @@ rawset(_G, "pthud_start_pos", 225*FRACUNIT)
 -- pt animation position end
 rawset(_G, "pthud_finish_pos", 175*FRACUNIT)
 
--- Remove vanilla crap.
-customhud.SetupItem("score", ptsr_hudmodname, nil, "game", 0)
-customhud.SetupItem("time", ptsr_hudmodname, nil, "game", 0)
-customhud.SetupItem("rankings", ptsr_hudmodname, nil, "scores", 0)
+--MinimalHud Command
+rawset(_G, "ptsr_minimalhud", function(p, arg)
+	if arg == "1" or arg == "on" or arg == "true"
+		PTSR.hud_style = "minimal"
+		if io and p == consoleplayer
+			local file = io.openlocal("client/SpiceRunners/hudstyle.txt", "w+")
+			file:write(PTSR.hud_style)
+			file:close()
+		end
+	elseif arg == "0" or arg == "off" or arg == "false"
+		PTSR.hud_style = "default"
+		if io and p == consoleplayer
+			local file = io.openlocal("client/SpiceRunners/hudstyle.txt", "w+")
+			file:write(PTSR.hud_style)
+			file:close()
+		end
+	else
+		CONS_Printf(p, "Insert a valid value")
+	end
+end)
+
+COM_AddCommand("ptsr_minimalhud", ptsr_minimalhud, COM_LOCAL)
 
 -- rank to patch
 PTSR.r2p = function(v,rank) 
@@ -92,9 +118,19 @@ PTSR.r2f = function(v,rank)
 	end
 end
 
+-- Hardcoded for now.
 addHook("HUD", function(v,p,c)
 	if PTSR.IsPTSR() then
 		hud.disable("textspectator") -- sonic team junior
+		hud.disable("score")
+		hud.disable("time")
+		hud.disable("rankings")
+		
+		if PTSR.hud_style == "minimal" then
+			hud.disable("rings")
+		else
+			hud.enable("rings")
+		end
 	end
 end)
 
