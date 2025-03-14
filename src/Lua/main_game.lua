@@ -419,6 +419,20 @@ addHook("ThinkFrame", do
 		end
 
 		if PTSR.timeover then
+			/* SCRAPPED, DUE TO EVERY MAP'S SECTOR NOT HAVING A COLORMAP
+			for sector in sectors.iterate do
+				local skin = skincolors[SKINCOLOR_RED].ramp[4]
+				local r,g,b = color.paletteToRgb(skin)
+										
+				if sector.colormap then
+					local colormap = sector.colormap
+					colormap.red = r
+					colormap.green = g
+					colormap.blue = b
+					colormap.alpha = ease.linear(abs(sin(leveltime*FU*500)),0,255)
+				end
+			end
+			*/
 			PTSR.timeover_tics = $ + 1
 		end
 	end
