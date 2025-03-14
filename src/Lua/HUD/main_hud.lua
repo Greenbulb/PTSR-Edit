@@ -2,16 +2,28 @@ local path = "HUD/Drawers/default"
 
 PTSR.hud_style = "default"
 
+-- ok for some reason its saving normally without gamequit stuff so idc about that rn.
 local hudstyle_file = io.openlocal("client/SpiceRunners/hudstyle.txt", "r")
 
 if hudstyle_file then
 	local value = hudstyle_file:read("*l")
 	
 	PTSR.hud_style = value
+	hudstyle_file:close()
 end
 
-function PTSR.isHudStyle(style)
-	return PTSR.hud_style == style
+function PTSR.isHudStyle(style_table)
+	for i=1, #style_table do
+		if style_table[i] == PTSR.hud_style then
+			return true
+		end
+	end
+	
+	return false
+end
+
+function PTSR.hudAddToStyleTable(funcname, style_get, add_style)
+	table.insert(PTSR.HUD[style_get][funcname].draw_style, add_style)
 end
 
 function PTSR.SetupHud(filepath)
@@ -29,7 +41,7 @@ function PTSR.SetupHud(filepath)
 				return 
 			end
 			
-			if not PTSR.isHudStyle(hudstyle) and hudtype == "game" then 
+			if not PTSR.isHudStyle(PTSR.HUD[hudstyle][funcname].draw_style) and hudtype == "game" then 
 				return
 			end
 			
@@ -40,7 +52,11 @@ function PTSR.SetupHud(filepath)
 			PTSR.HUD[hudstyle] = {}
 		end
 		
-		PTSR.HUD[hudstyle][funcname] = {draw = new_drawfunc, draw_type = type, draw_layer = hudlayer, draw_style = hudstyle}
+		PTSR.HUD[hudstyle][funcname] = {}
+		PTSR.HUD[hudstyle][funcname].draw = new_drawfunc
+		PTSR.HUD[hudstyle][funcname].draw_type = type
+		PTSR.HUD[hudstyle][funcname].draw_layer = hudlayer
+		PTSR.HUD[hudstyle][funcname].draw_style = {hudstyle}
 		
 		customhud.SetupItem(
 			"PTSR:"..string.upper(hudstyle)..":"..string.upper(funcname), -- String Example: "PTSR:DEFAULT:BAR"
@@ -53,24 +69,6 @@ end
 
 local function SetupHud(filename)
 	PTSR.SetupHud(path.."/"..filename)
-end
-
-local function FillMissingHudElements(style)
-	if PTSR.HUD[style] then
-		for funcname,v in pairs(PTSR.HUD["default"]) do
-			if not PTSR.HUD[style][funcname] then
-				--print("CCC: "..funcname) --DEBUG
-				PTSR.HUD[style][funcname] = PTSR.HUD["default"][funcname]
-				
-				customhud.SetupItem(
-					"PTSR:"..string.upper(style)..":"..string.upper(funcname),
-					ptsr_hudmodname, PTSR.HUD[style][funcname].draw, 
-					PTSR.HUD[style][funcname].draw_type or "game", 
-					PTSR.HUD[style][funcname].draw_layer or 0
-				)
-			end
-		end
-	end
 end
 
 rawset(_G, "ptsr_hudmodname", "spicerunners")
@@ -147,7 +145,7 @@ SetupHud "Gamemode"
 SetupHud "OvertimeMultiplier"
 SetupHud "UntilEnd"
 
--- Minimal Hud Setup --
+-- [Minimal Hud Setup] --
 path = "HUD/Drawers/minimal";
 
 SetupHud "Bar"
@@ -159,7 +157,7 @@ SetupHud "OvertimeMultiplier"
 SetupHud "Lives"
 
 path = "HUD/Drawers/default";
--- Minimal Hud Setup End --
+-- [Minimal Hud Setup End] --
 
 -- Hardcoded. (And has the legacy prefix)
 dofile "HUD/intermission/drawVoteScreenChosenMap.lua"
@@ -177,14 +175,15 @@ SetupHud "Score"
 SetupHud "HurryUp"
 SetupHud "PFViewpoint"
 
--- Minimal Hud Setup --
-
+-- [Minimal Hud Setup] --
 path = "HUD/Drawers/minimal";
 
 SetupHud "Combo"
 SetupHud "Score" -- And rings
 
 path = "HUD/Drawers/default";
--- Minimal Hud Setup End --
+-- [Minimal Hud Setup End] --
 
-FillMissingHudElements("minimal")
+-- Copy some "default" huds into "minimal".
+PTSR.hudAddToStyleTable("Gamemode", "default", "minimal")
+PTSR.hudAddToStyleTable("ItsPizzaTime", "default", "minimal")
