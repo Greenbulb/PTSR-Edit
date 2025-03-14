@@ -21,6 +21,7 @@ function PTSR.pfDoShieldDamage(toucher, special, disablepfstop, nosound, disable
 			special.momy = $/3
 			special.momz = $/3
 			
+			special.pfstuntime2 = $ or 0 -- HMMMM
 			special.pfstuntime2 = $ + pfstoptime
 		end
 
