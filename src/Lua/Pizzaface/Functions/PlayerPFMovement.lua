@@ -1,6 +1,8 @@
 local PLAYPF_SPEED = 28*FU
 local PLAYPF_DEADZONE = 50 / 10
 
+local controls_angle = PTSR.Require("Pizzaface/Functions/ControlsAngle")
+
 return function(player)
 	-- handle movement
 	-- community feedback recommended us that we do this
