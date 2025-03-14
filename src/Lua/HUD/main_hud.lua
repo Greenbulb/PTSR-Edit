@@ -82,14 +82,14 @@ rawset(_G, "pthud_finish_pos", 175*FRACUNIT)
 rawset(_G, "ptsr_minimalhud", function(p, arg)
 	if arg == "1" or arg == "on" or arg == "true"
 		PTSR.hud_style = "minimal"
-		if io and p == consoleplayer
+		if io and p == consoleplayer then
 			local file = io.openlocal("client/SpiceRunners/hudstyle.txt", "w+")
 			file:write(PTSR.hud_style)
 			file:close()
 		end
 	elseif arg == "0" or arg == "off" or arg == "false"
 		PTSR.hud_style = "default"
-		if io and p == consoleplayer
+		if io and p == consoleplayer then
 			local file = io.openlocal("client/SpiceRunners/hudstyle.txt", "w+")
 			file:write(PTSR.hud_style)
 			file:close()
