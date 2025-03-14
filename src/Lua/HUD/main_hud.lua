@@ -139,6 +139,7 @@ SetupHud "ItsPizzaTime"
 SetupHud "Tooltips"
 SetupHud "Lapping"
 SetupHud "Rank"
+SetupHud "PlayerPF"
 SetupHud "PlayerPFSwap"
 SetupHud "Gamemode"
 SetupHud "OvertimeMultiplier"
@@ -151,7 +152,6 @@ SetupHud "Bar"
 SetupHud "Tooltips"
 SetupHud "Lapping"
 SetupHud "Rank"
-SetupHud "PlayerPF"
 SetupHud "OvertimeMultiplier"
 SetupHud "Lives"
 
@@ -186,3 +186,4 @@ path = "HUD/Drawers/default";
 -- Copy some "default" huds into "minimal".
 PTSR.hudAddToStyleTable("Gamemode", "default", "minimal")
 PTSR.hudAddToStyleTable("ItsPizzaTime", "default", "minimal")
+PTSR.hudAddToStyleTable("PlayerPF", "default", "minimal")

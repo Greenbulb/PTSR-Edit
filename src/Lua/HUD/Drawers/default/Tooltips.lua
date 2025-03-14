@@ -20,7 +20,6 @@ local tooltips_hud = function(v, player)
 		ese = tween < FU and ease.linear(tween, pthud_finish_pos+pthud_offset, (200*FU)+pthud_offset) or (200*FU)+pthud_offset
 	end
 
-
 	if (not player.ptsr.pizzaface) and (player.ptsr.outofgame) and (player.playerstate ~= PST_DEAD) 
 	and not (player.ptsr.laps >= PTSR.maxlaps and CV_PTSR.default_maxlaps.value) and not PTSR.gameover then
 		if not player.hold_newlap then
@@ -37,31 +36,6 @@ local tooltips_hud = function(v, player)
 			v.drawString(165*FU, ese-(FU*8), practicemodetext , V_SNAPTOBOTTOM, "thin-fixed-center")
 		end
 		*/
-		
-		if player.ptsr.pizzaface then
-			if player.realmo.pfstuntime then
-				v.drawString(160, 100, "You will be unfrozen in: "..player.realmo.pfstuntime/TICRATE.. " seconds.", V_TRANSLUCENT|V_SNAPTOBOTTOM|V_PERPLAYER, "thin-center")
-			end
-		
-			if player.pizzachargecooldown then
-				v.drawString(165, 157, "\x85\* COOLING DOWN *", V_SNAPTOBOTTOM, "thin-center")
-			elseif player.pizzacharge then
-				local percentage = (FixedDiv(player.pizzacharge*FRACUNIT, 35*FRACUNIT)*100)/FRACUNIT
-				
-				v.drawString(165, 157, "\x85\* CHARGING \$percentage\% *", V_SNAPTOBOTTOM, "thin-center")
-			else
-				v.drawString(165, 157, "\x85\* HOLD FIRE TO TELEPORT *", V_SNAPTOBOTTOM, "thin-center")
-			end
-
-			v.drawString(165, 157-10, "\x85\* HOLD C1 TO DASH *", V_SNAPTOBOTTOM, "thin-center")
-			if not player.ptsr.pizzachase then
-				if not (player.ptsr.pizzachase_cooldown) then
-					v.drawString(165, 157-20, "\x85\* PRESS C2 TO USE CHASEDOWN *", V_SNAPTOBOTTOM, "thin-center")
-				else
-					v.drawString(165, 157-20, "\x85\* COOLING DOWN *", V_SNAPTOBOTTOM, "thin-center")
-				end
-			end
-		end
 		
 		-- Early returns start here, no pizza face code allowed beyond here --
 		if player.ptsr.pizzaface then return end

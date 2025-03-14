@@ -1,9 +1,9 @@
-local minimal_playerpf = function(v, player)
+local playerpfhelp = function(v, player)
 	if PTSR.pizzatime then
 		if player.ptsr.pizzaface then
 			local tooltips_pos = {
-				x=12,
-				y=55
+				x = 12,
+				y = 55
 			}
 			local buttons_padding = {
 				x = 21,
@@ -17,13 +17,21 @@ local minimal_playerpf = function(v, player)
 			if player.realmo.pfstuntime then
 				local stun_graphic = v.cachePatch("MINIM_STUN")
 				local stun = {
-					x= 160,
-					y= 179,
+					x = 160,
+					y = 160,
 					flags = V_SNAPTOBOTTOM|V_PERPLAYER,
 					string_flags = "thin-center"
 				}
-				v.draw(stun.x, stun.y, stun_graphic, stun.flags)
-				v.drawString(stun.x, stun.y-4, player.realmo.pfstuntime/TICRATE, stun.flags|V_YELLOWMAP, stun.string_flags)
+				
+				if PTSR.hud_style == "minimal" then
+					stun.y = $ + 10
+				else
+					stun.x = $ + 3 -- make it look like its at the center of the bar.
+				end
+				
+				-- TODO: Automatically offset to center based on patch width/height instead of using magic numbers.
+				v.draw(stun.x-9, stun.y-9, stun_graphic, stun.flags)
+				v.drawString(stun.x-9, stun.y-9, player.realmo.pfstuntime/TICRATE, stun.flags|V_YELLOWMAP, stun.string_flags)
 			end
 			
 			local graphic_c1 = v.cachePatch("MINIM_BTNC1")
@@ -57,4 +65,4 @@ local minimal_playerpf = function(v, player)
 	end
 end
 
-return "PlayerPF", minimal_playerpf, "game", "minimal"
+return "PlayerPF", playerpfhelp
