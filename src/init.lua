@@ -8,8 +8,8 @@ for i = 0, 2
 	sfxinfo[sfx_prepr1 + i].caption = "Boink"
 end
 
-sfxinfo[sfx_ptsrc1].caption = "Crown get!"
-sfxinfo[sfx_ptsrc2].caption = "Crown lost!"
+sfxinfo[sfx_ptsrc1].caption = "Crown lost!"
+sfxinfo[sfx_ptsrc2].caption = "Crown get!"
 
 sfxinfo[sfx_pizzah].caption = "Pizzaface laughs"
 sfxinfo[sfx_coneba].caption = "Coneball laughs"

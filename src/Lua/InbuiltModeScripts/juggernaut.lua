@@ -301,7 +301,8 @@ addHook("TouchSpecial", function(special, toucher)
 			special.equip_pmo = toucher
 			
 			S_StartSound(nil, sfx_s24f)
-			
+			S_StartSound(nil, sfx_ptsrc2, player)
+
 			player.powers[pw_invulnerability] = $ + 3*TICRATE
 			
 			local output_text = player.name.. " picked up a crown!"
