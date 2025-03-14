@@ -3,8 +3,7 @@ addHook("MobjCollide", function(peppino, pizza)
 	local pizza_player = pizza.player
 	
 	if not (player and player.valid) then return end
-	if not (pizza_player.ptsr) then return end
-	if not (pizza_player and pizza_player.valid) then return end
+	if not (pizza_player and pizza_player.valid and pizza_player.ptsr) then return end
 	if not (pizza_player.ptsr.pizzaface) then return end
 
 	if not PTSR.pfCanDamage(peppino, pizza) then return end
