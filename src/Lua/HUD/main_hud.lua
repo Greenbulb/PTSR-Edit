@@ -2,7 +2,6 @@ local path = "HUD/Drawers/default"
 
 PTSR.hud_style = "default"
 
--- ok for some reason its saving normally without gamequit stuff so idc about that rn.
 local hudstyle_file = io.openlocal("client/SpiceRunners/hudstyle.txt", "r")
 
 if hudstyle_file then
