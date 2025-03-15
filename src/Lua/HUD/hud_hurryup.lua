@@ -8,13 +8,13 @@ end
 
 local hurryup_hud = function(v, player)
 	if not PTSR.timeleft then return end
-	if PTSR.timeleft > 20*TICRATE then return end
+	if PTSR.timeleft > PTSR.MusicList.OvertimeTics then return end
 	if not multiplayer then return end
 	if not PTSR.client_allowhurryupmusic then return end
 	
 	local x = 320*FRACUNIT
 	local y = 100*FRACUNIT
-	local timedif = 20*TICRATE-PTSR.timeleft
+	local timedif = PTSR.MusicList.OvertimeTics-PTSR.timeleft
 	local timestring = G_TicsToMTIME(PTSR.timeleft)
 
 	-- fade the screen if close to overtime but not really overtime

@@ -6,6 +6,7 @@ PTSR.MusicList = {
 	},
 	Overtime = "OTMUSB", -- default
 	HurryUp = "OTMUSA", -- default
+	OvertimeTics = 20*TICRATE -- default
 }
 
 PTSR.client_allowhurryupmusic = true
@@ -21,6 +22,14 @@ local commands = {
 		end
 		
 		PTSR.MusicList.Laps[tonumber(arg1)] = arg2
+	end,
+	["#OVERTIME_TICS"] = function(arg1)
+		if arg1 == nil
+		or tonumber(arg1) == nil then
+			return
+		end
+
+		PTSR.MusicList.OvertimeTics = tonumber(arg1)
 	end,
 	["#TOGGLE_HURRYUP_MUSIC"] = function(arg1, arg2)
 		if (arg1 == nil) then
@@ -101,8 +110,7 @@ addHook("ThinkFrame", function()
 		--PTSR.timeleft <= 56*TICRATE
 		if leveltime then -- srb2 is super slow tbh
 			if PTSR.timeover then
-				
-				local mus = CV_PTSR.overtime_music.value
+				local mus = CV_PTSR.overtime_music.value or PTSR.MusicList.OvertimeTics
 				
 				local mus_str = PTSR.MusicList.Overtime
 				local gm_metadata = PTSR.currentModeMetadata()
@@ -123,7 +131,8 @@ addHook("ThinkFrame", function()
 				if mus then
 					return
 				end
-			elseif PTSR.timeleft <= 20*TICRATE and multiplayer
+			elseif PTSR.MusicList.OvertimeTics
+			and PTSR.timeleft <= PTSR.MusicList.OvertimeTics and multiplayer
 			and PTSR.client_allowhurryupmusic then -- Hurry up
 				local mus = CV_PTSR.overtime_music.value
 				
