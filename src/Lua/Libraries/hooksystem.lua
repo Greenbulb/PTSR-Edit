@@ -17,6 +17,7 @@ local handler_snapany = {
 local handler_default = handler_snaptrue
 
 local hooks = {}
+hooks.preparry = {}
 hooks.onparry = {}
 hooks.canparry = {}
 hooks.onlap = {}
@@ -30,6 +31,7 @@ hooks.onparried = {}
 hooks.ongameend = {}
 hooks.pfthink = {}
 hooks.pfprestunthink = {}
+hooks.pfpredamage = {}
 hooks.pfdamage = {}
 hooks.pfteleport = {}
 hooks.pfplayerfind = {}

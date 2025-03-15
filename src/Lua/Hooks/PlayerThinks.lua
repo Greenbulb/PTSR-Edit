@@ -15,6 +15,7 @@ states[S_PT_PARRY] = {
     nextstate = S_PT_PARRY
 }
 
+freeslot("sfx_ptpray")
 
 -- simple midgame joining blocker, variable init & more
 addHook("PlayerSpawn", function(player)
@@ -53,6 +54,7 @@ addHook("PlayerSpawn", function(player)
 				end
 				
 				player.powers[pw_invulnerability] = 5*TICRATE
+				S_StartSound(nil, sfx_ptpray, player)
 			end
 		end
 	end
@@ -77,12 +79,16 @@ addHook("PlayerThink", function(player)
 		player.playerstate = PST_REBORN
 	end
 
-	if PTSR.pizzatime and PTSR.timeover and not gm_metadata.disableovertimeshoes then
+	if PTSR.pizzatime and PTSR.timeover and gm_metadata.overtimeshoes then
 		player.powers[pw_sneakers] = 1
 	end
 
 	if player and player.mo and player.mo.valid and player.mo.pf_tele_delay then
 		player.mo.pf_tele_delay = $ - 1
+	end
+	
+	if player and player.ptsr then
+		player.ptsr.pf_immunity = max(0, $ - 1)
 	end
 end)
 

@@ -94,10 +94,10 @@ COM_AddCommand("ptsr_spawnpfai", function(player, randomplayer, pftype)
 		return
 	end
 	
-	local newpizaface = PTSR:SpawnPFAI(pftype)
+	local newpizaface = PTSR.pfSpawnAI(pftype)
 	
 	if (randomplayer and not randomplayer == "false") then
-		PTSR:RNGPizzaTP(newpizaface, true)
+		PTSR.pfRandomTP(newpizaface, true)
 	end
 	
 	CONS_Printf(player, "Spawned an AI Pizzaface")
@@ -132,6 +132,16 @@ COM_AddCommand("ptsr_timeto1", function(player)
 	
 	PTSR.timeleft = 1
 end, 1)
+
+COM_AddCommand("ptsr_timeto20", function(player)
+	if not PTSR.IsPTSR() then
+		CONS_Printf(player, "Command must be ran in the Pizza Time Spice Runners mode.")
+		return
+	end
+	
+	PTSR.timeleft = 20*TICRATE
+end, 1)
+
 // ADDED FOR TESTING PURPOSES
 
 CV_PTSR.x_positioning = CV_RegisterVar({
@@ -444,6 +454,22 @@ CV_PTSR.voteseconds = CV_RegisterVar({
 	flags = CV_NETVAR,
 	PossibleValue = CV_Unsigned, 
 })
+
+CV_PTSR.serversided_enemyrespawn = CV_RegisterVar({
+	name = "PTSR_serversided_enemyrespawn",
+	defaultvalue = "off",
+	flags = CV_NETVAR,
+	PossibleValue = CV_OnOff, 
+})
+
+CV_PTSR.serversided_enemyrespawn_debug = CV_RegisterVar({
+	name = "PTSR_serversided_enemyrespawn_debug",
+	defaultvalue = "off",
+	flags = 0,
+	PossibleValue = CV_OnOff, 
+})
+
+
 
 local luaOnly = "iamlua" .. P_RandomFixed()
 

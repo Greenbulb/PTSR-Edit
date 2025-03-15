@@ -1,11 +1,15 @@
 freeslot("TOL_PTSR")
 freeslot("sfx_pizzah", "sfx_pizzao", "sfx_coneba", "sfx_pepdie", "sfx_lap2", "sfx_pzprry",
-		 "sfx_prepr1", "sfx_prepr2", "sfx_prepr3", "MT_PT_PARRY", "S_PT_PARRY", "SPR_PRRY")
+		 "sfx_prepr1", "sfx_prepr2", "sfx_prepr3", "sfx_ptsrc1", "sfx_ptsrc2", "MT_PT_PARRY",
+		 "S_PT_PARRY", "SPR_PRRY")
 freeslot("sfx_evlagh")
 
 for i = 0, 2
 	sfxinfo[sfx_prepr1 + i].caption = "Boink"
 end
+
+sfxinfo[sfx_ptsrc1].caption = "Crown lost!"
+sfxinfo[sfx_ptsrc2].caption = "Crown get!"
 
 sfxinfo[sfx_pizzah].caption = "Pizzaface laughs"
 sfxinfo[sfx_coneba].caption = "Coneball laughs"
@@ -13,6 +17,117 @@ sfxinfo[sfx_pepdie].caption = "Death"
 sfxinfo[sfx_lap2].caption = "New lap!"
 
 rawset(_G, "FUNC_PTSR", {}) -- functions
+
+rawset(_G, "PTSR", { -- variables
+	spawn_location = 
+	{x = 0, y = 0, z = 0, angle = 0}, -- where the sign is at the start of the map
+	
+	end_location = 
+	{x = 0, y = 0, z = 0, angle = 0}, -- where the sign originally was in the map placement
+	
+	pizzatime = false,
+	laps = 0,
+	quitting = false,
+	pizzatime_tics = 0,
+	titlecard_time = 0,
+	
+	maxlaps = 5,
+
+	timeleft = 0,
+	
+	timeover = false,
+	
+	endsector = nil,
+	
+	showtime = false,
+	
+	hudstuff = {
+		anim = 0,
+		anim_active = false,
+		
+		rev = false,
+		wait_tics = 0,
+		
+		stop = false,
+	},
+	
+	endscreen_tics = 0,
+	
+	endscreen_phase = 1,
+	
+	endscreen_phase_tics = 0,
+	
+	gameover_tics = 0,
+
+	gameover = false,
+	
+	deathrings = {},
+	
+	timeover_tics = 0,
+	
+	maxrankpoints = 0,
+	
+	vote_maplist = {
+		{votes = 0, mapnum = 1, gamemode = 1},
+		{votes = 0, mapnum = 1, gamemode = 1},
+		{votes = 0, mapnum = 1, gamemode = 1}
+	},
+	
+	vote_roulettelist = {
+		/*
+			{
+				[1] = {
+					mapnum = 1,
+					gamemode = 1,
+					voter_info = {
+						name = "John Doe"
+						skin = "sonic"
+						skincolor = SKINCOLOR_BLUE
+					},
+				}
+			}
+		*/
+	},
+	
+	vote_timeleft = 0,
+	
+	vote_screen = false,
+	
+	vote_roulette_tictilmapswitch = 0,
+	
+	vote_roulette_ticsleft = 0,
+	
+	vote_roulette_turnsleft = 100,
+	
+	vote_routette_selection = 1,
+	
+	vote_roulette_ticspeed = 50,
+	
+	vote_routette_ticspeed_turnsleft = 7,
+	
+	vote_routette_ticspeed_turnsleft_start = 7, -- long ass name brah
+	
+	vote_finalpick = nil,
+	
+	nextmapvoted = 0,
+	
+	nextmapvoted_info = {},
+	
+	dustdeviltimer = 0, -- when this reaches a certain number, every pizza face spawns an alive dust devil
+	
+	gamemode = 1,
+	
+	nextgamemode = 1,
+
+	pizzas = {},
+	
+	BubbleMobjList = {},
+})
+
+PTSR.HUD = {
+	default = {};
+	minimal = {};
+}
 
 freeslot("MT_PIZZAMASK", "S_PIZZAFACE", "S_CONEBALL", "S_PF_EGGMAN", "S_SUMMADAT_PF", "SPR_PZAT", "SPR_CONB", "SPR_SMAD", "sfx_smdah", "S_GOOCH_PF", "SPR_PZAD")
 freeslot("sfx_nrmlfc","S_NORMALFACE_PF","SPR_NMFC")
@@ -35,15 +150,6 @@ states[S_PIZZAFACE] = {
     var1 = P,
     var2 = 2,
     nextstate = S_PIZZAFACE
-}
-
-states[S_CONEBALL] = {
-    sprite = SPR_CONB,
-    frame = FF_ANIMATE|FF_FULLBRIGHT|A,
-    tics = -1,
-    var1 = H,
-    var2 = 2,
-    nextstate = S_CONEBALL
 }
 
 states[S_PF_EGGMAN] = {
@@ -85,13 +191,14 @@ states[S_GOOCH_PF] = {
     nextstate = S_GOOCH_PF
 }
 
---this is UGLY.
-dofile "SaxAnimation/Init.lua"
-dofile "SaxAnimation/UpdatePerFrame.lua"
-
+dofile "Libraries/require.lua"
 dofile "Libraries/customhudlib.lua"
 
 dofile "Libraries/hooksystem.lua"
+
+--this is UGLY.
+dofile "SaxAnimation/Init.lua"
+dofile "SaxAnimation/UpdatePerFrame.lua"
 
 dofile "Libraries/sglib"
 
@@ -103,11 +210,6 @@ customhud.SetupFont("STKPT", -1, 4)
 customhud.SetupFont("PTLAP")
 
 dofile "main_game.lua"
-
-/*
--- SAXA HERE HI I DO DA TITLECARDIANERY
-dofile "titlecards.lua"
-*/
 
 dofile "Functions/end_game.lua"
 dofile "Functions/get_ringcount.lua"
@@ -122,6 +224,8 @@ dofile "Hooks/PlayerThinks.lua"
 dofile "Hooks/PlayerDeath.lua"
 dofile "Hooks/PlayerTweaks.lua"
 dofile "Hooks/LineTriggerSystem.lua"
+
+dofile "PlayerScripts/Shields/player_attractionhandle.lua"
 
 dofile "PlayerScripts/player_resetplayervars.lua"
 dofile "PlayerScripts/player_parry.lua"
@@ -140,37 +244,14 @@ dofile "PlayerScripts/player_scorehud"
 dofile "Libraries/libs.lua"
 dofile "exit_handle.lua"
 dofile "Hooks/music_handle.lua"
-dofile "pizzaface.lua"
 
 dofile "HUD/name_tags.lua"
 
 dofile "HUD/main_hud.lua"
-dofile "HUD/hud_doorfade.lua"
-dofile "HUD/hud_bar.lua"
-dofile "HUD/hud_itspizzatime.lua"
-dofile "HUD/hud_tooltips.lua"
-dofile "HUD/hud_lap.lua"
-dofile "HUD/hud_rank.lua"
-dofile "HUD/hud_faceswap.lua"
-dofile "HUD/hud_gamemode.lua"
-dofile "HUD/hud_overtimemulti.lua"
-dofile "HUD/hud_untilend.lua"
 
-dofile "HUD/intermission/drawVoteScreenChosenMap.lua"
-dofile "HUD/intermission/drawVoteScreenRoulette.lua"
-dofile "HUD/intermission/drawVoteScreenMaps.lua"
-dofile "HUD/intermission/drawVoteScreenTimer.lua"
-dofile "HUD/intermission/draw_p_rank_animation.lua"
-dofile "HUD/intermission/drawBackground.lua"
-dofile "HUD/intermission/main.lua"
-
-dofile "HUD/hud_combo.lua"
-dofile "HUD/hud_overtime.lua"
-dofile "HUD/hud_rankings.lua"
-dofile "HUD/hud_score.lua"
-dofile "HUD/hud_time.lua"
-dofile "HUD/hud_hurryup.lua"
-dofile "HUD/hud_pfviewpoint.lua"
+dofile "Pizzaface/Functions/_init"
+dofile "Pizzaface/AI/_init"
+dofile "Pizzaface/PlayerPF/_init"
 
 dofile "discord_botleaderboard.lua"
 

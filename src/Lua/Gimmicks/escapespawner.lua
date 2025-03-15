@@ -96,13 +96,116 @@ function PTSR.EscapeSpawnFromTable(_table)
 	end
 end
 
+local luaOnly = P_RandomFixed()..P_RandomFixed()
+
+addHook("NetVars", function(net)
+	luaOnly = net($)
+end)
+
+COM_AddCommand("_PTSR_SS_ENEMY_RESPAWN", function(player, testkey, ...)
+	local isNotServer = player ~= server 
+	local isNotKey = luaOnly ~= testkey
+	
+	if isNotKey or isNotServer then
+		local text = ""
+		
+		if isNotServer then
+			text = "You are not the server!"
+		elseif isNotKey then
+			text = "Invalid Key!"
+		end
+		
+		CONS_Printf(player, text)
+		
+		return
+	end
+	
+	local args = {...}
+	
+	for i=1,#args do
+		local arg = tonumber(args[i])
+		
+		if arg then
+			if PTSR.ESLOCATIONS[arg] then
+				local v = PTSR.ESLOCATIONS[arg]
+				
+				PTSR.EscapeSpawnFromTable(v)
+				v.pending = false
+				
+				if CV_PTSR.serversided_enemyrespawn_debug.value then
+					print("Spawned: ".. arg.. " " .. i)
+				end
+			end
+		end
+	end
+end, 1)
+
+COM_AddCommand("_PTSR_SS_ENEMY_TELEPORT", function(player, testkey, ...)
+	local isNotServer = player ~= server 
+	local isNotKey = luaOnly ~= testkey
+	
+	if isNotKey or isNotServer then
+		local text = ""
+		
+		if isNotServer then
+			text = "You are not the server!"
+		elseif isNotKey then
+			text = "Invalid Key!"
+		end
+		
+		CONS_Printf(player, text)
+		
+		return
+	end
+	
+	local args = {...}
+	
+	for i=1,#args do
+		local arg = tonumber(args[i])
+		
+		if arg then
+			if PTSR.ESLOCATIONS[arg] then
+				local v = PTSR.ESLOCATIONS[arg]
+				
+				P_SetOrigin(v.child, v.x, v.y, v.z)
+				v.child.angle = v.angle
+				P_SpawnMobj(v.x, v.y, v.z, MT_ESCAPESPAWNER_ANIM)
+				S_StartSound(v.child, sfx_espawn)
+				
+				if CV_PTSR.serversided_enemyrespawn_debug.value then
+					print("Teleported: ".. arg.. " " .. i)
+				end
+			end
+		end
+	end
+end, 1)
+
 addHook("ThinkFrame", function()
 	if not (PTSR.ESLOCATIONS.loaded) then return end
 	if not leveltime then return end -- man srb2 sucks
 	if not PTSR.IsPTSR() then return end
 	if PTSR.gameover then return end
 	
-	local cyclesleft = 50
+	local serversided = (CV_PTSR.serversided_enemyrespawn.value and isserver) 
+	
+	-- Block logic if not server, and if server-sided option is on.
+	if CV_PTSR.serversided_enemyrespawn.value and not isserver then
+		return
+	end
+	
+	-- Server-Side exclusive
+	local teleport_queue = {}
+	local respawn_queue = {}
+	
+	local count = PTSR_COUNT()
+
+	if not count.peppinos then return end 
+
+	local cyclesleft = 8 + (42/(count.peppinos or 1))
+	
+	if serversided then
+		cyclesleft = 5
+	end
 	
 	while cyclesleft > 0 do
 		cyclesleft = $ - 1
@@ -132,7 +235,7 @@ addHook("ThinkFrame", function()
 					and (not player.ptsr.outofgame) then
 						local dist = R_PointToDist2(player.mo.x, player.mo.y, v.x, v.y)
 						
-						if dist < 4096*FU then
+						if dist < 5120*FU then
 							local vMobj = P_SpawnMobj(v.x, v.y, v.z, MT_RAY) -- Spawn a ray to check position (Because P_CheckSight only takes mobj_t)
 							vMobj.fuse = 1
 							
@@ -145,8 +248,13 @@ addHook("ThinkFrame", function()
 							if (vMobj and vMobj.valid) and P_CheckSight(vMobj, player.mo) then							
 								if (v.lap_list[player] < player.ptsr.laps) or v.pending then
 									v.lap_list[player] = player.ptsr.laps
-									PTSR.EscapeSpawnFromTable(v)
-									v.pending = false
+									
+									if serversided then
+										table.insert(respawn_queue, table_cycle)
+									else
+										PTSR.EscapeSpawnFromTable(v)
+										v.pending = false
+									end
 								end
 							end
 						end
@@ -174,11 +282,71 @@ addHook("ThinkFrame", function()
 				if PTSR.EscapeSpawnList[v.type] and type(PTSR.EscapeSpawnList[v.type]) == "table" and 
 				PTSR.EscapeSpawnList[v.type].arealock then
 					if dist > PTSR.EscapeSpawnList[v.type].arealock then
-						P_SetOrigin(v.child, v.x, v.y, v.z)
-						v.child.angle = v.angle
-						P_SpawnMobj(v.x, v.y, v.z, MT_ESCAPESPAWNER_ANIM)
-						S_StartSound(v.child, sfx_espawn)
+						if serversided then
+							table.insert(teleport_queue, table_cycle)
+						else -- if server sided
+							P_SetOrigin(v.child, v.x, v.y, v.z)
+							v.child.angle = v.angle
+							P_SpawnMobj(v.x, v.y, v.z, MT_ESCAPESPAWNER_ANIM)
+							S_StartSound(v.child, sfx_espawn)
+						end
 					end
+				end
+			end
+		end
+		
+		if serversided then
+			if #teleport_queue then
+				local no_repeat = {}
+				
+				for i=1, #teleport_queue do
+					for r,v in ipairs(no_repeat) do
+						if v == teleport_queue[i] then
+							print("found_repeat")
+							continue
+						end
+					end
+					
+					table.insert(no_repeat, teleport_queue[i])
+				end
+				
+				local arglist = ""
+				
+				for i=1, #no_repeat do
+					arglist = $ .. no_repeat[i] .. " "
+				end
+				
+				if #no_repeat then
+					local text = "_PTSR_SS_ENEMY_TELEPORT "..luaOnly.." "..arglist
+					
+					COM_BufAddText(nil, text)
+				end
+			end
+			
+			if #respawn_queue then
+				local no_repeat = {}
+				
+				for i=1, #teleport_queue do
+					for r,v in ipairs(no_repeat) do
+						if v == teleport_queue[i] then
+							print("found_repeat")
+							continue
+						end
+					end
+					
+					table.insert(no_repeat, teleport_queue[i])
+				end
+				
+				local arglist = ""
+				
+				for i=1, #no_repeat do
+					arglist = $ .. no_repeat[i] .. " "
+				end
+				
+				if #no_repeat then
+					local text = "_PTSR_SS_ENEMY_RESPAWN "..luaOnly.." "..arglist
+					
+					COM_BufAddText(nil, text)
 				end
 			end
 		end

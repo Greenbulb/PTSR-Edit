@@ -29,7 +29,7 @@ PTSR.PizzaTimeTrigger = function(mobj)
 		P_SetOrigin(thesign, PTSR.spawn_location.x, PTSR.spawn_location.y, PTSR.spawn_location.z)
 		
 		if multiplayer and aimode and not CV_PTSR.nopizza.value then
-			PTSR:SpawnPFAI()
+			PTSR.pfSpawnAI()
 		end
 		
 		thesign.angle = PTSR.spawn_location.angle

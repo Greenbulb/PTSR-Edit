@@ -22,110 +22,6 @@ G_AddGametype({
     description = "Run away from pizzaface, in style!"
 })
 
-rawset(_G, "PTSR", { -- variables
-	spawn_location = 
-	{x = 0, y = 0, z = 0, angle = 0}, -- where the sign is at the start of the map
-	
-	end_location = 
-	{x = 0, y = 0, z = 0, angle = 0}, -- where the sign originally was in the map placement
-	
-	pizzatime = false,
-	laps = 0,
-	quitting = false,
-	pizzatime_tics = 0,
-	titlecard_time = 0,
-	
-	maxlaps = 5,
-
-	timeleft = 0,
-	
-	timeover = false,
-	
-	endsector = nil,
-	
-	showtime = false,
-	
-	hudstuff = {
-		anim = 0,
-		anim_active = false,
-		
-		rev = false,
-		wait_tics = 0,
-		
-		stop = false,
-	},
-	
-	endscreen_tics = 0,
-	
-	endscreen_phase = 1,
-	
-	endscreen_phase_tics = 0,
-	
-	gameover_tics = 0,
-
-	gameover = false,
-	
-	deathrings = {},
-	
-	timeover_tics = 0,
-	
-	maxrankpoints = 0,
-	
-	vote_maplist = {
-		{votes = 0, mapnum = 1, gamemode = 1},
-		{votes = 0, mapnum = 1, gamemode = 1},
-		{votes = 0, mapnum = 1, gamemode = 1}
-	},
-	
-	vote_roulettelist = {
-		/*
-			{
-				[1] = {
-					mapnum = 1,
-					gamemode = 1,
-					voter_info = {
-						name = "John Doe"
-						skin = "sonic"
-						skincolor = SKINCOLOR_BLUE
-					},
-				}
-			}
-		*/
-	},
-	
-	vote_timeleft = 0,
-	
-	vote_screen = false,
-	
-	vote_roulette_tictilmapswitch = 0,
-	
-	vote_roulette_ticsleft = 0,
-	
-	vote_roulette_turnsleft = 100,
-	
-	vote_routette_selection = 1,
-	
-	vote_roulette_ticspeed = 50,
-	
-	vote_routette_ticspeed_turnsleft = 7,
-	
-	vote_routette_ticspeed_turnsleft_start = 7, -- long ass name brah
-	
-	vote_finalpick = nil,
-	
-	nextmapvoted = 0,
-	
-	nextmapvoted_info = {},
-	
-	dustdeviltimer = 0, -- when this reaches a certain number, every pizza face spawns an alive dust devil
-	
-	gamemode = 1,
-	
-	nextgamemode = 1,
-
-	pizzas = {},
-})
-
 PTSR.isOvertime = function()
 	return PTSR.timeover
 end
@@ -147,6 +43,7 @@ PTSR.default_playervars = {
 	pizzachase = false,
 	pizzachase_cooldown = 0,
 	pizzachase_time = 0,
+	pizzasprint_time = 0,
 	pizzamask = nil,
 	
 	laps = 0,
@@ -216,6 +113,11 @@ PTSR.default_playervars = {
 	},
 	
 	isWinner = false, -- have they won a round (most points surviving)
+	
+	pf_immunity = 0, -- How many tics you are immune to pizzaface.
+	
+	-- Shields
+	atrraction_timer = 0,
 }
 PTSR.gamemode_list = {}
 
@@ -369,7 +271,9 @@ addHook("NetVars", function(net)
 		
 		"pizzaface_speed_multi",
 
-		"pizzas"
+		"pizzas",
+		
+		"BubbleMobjList",
 	}
 	
 	for i,v in ipairs(sync_list) do
@@ -467,7 +371,7 @@ addHook("ThinkFrame", do
 				
 				if PTSR.timeleft <= 0 then
 					PTSR.timeleft = 0
-					if multiplayer then
+					if multiplayer then -- ITS OVERTIME!
 						PTSR.timeover = true
 						
 						local timeover_text = "\x8F*Overtime!"
@@ -490,15 +394,45 @@ addHook("ThinkFrame", do
 						if overtime_triggertag and tonumber(overtime_triggertag) then
 							P_LinedefExecute(tonumber(overtime_triggertag))
 						end
+						
+						
+						for i=1,#PTSR.BubbleMobjList do
+							local bubble = PTSR.BubbleMobjList[i]
+							
+							PTSR.SetBubbleActive(bubble, true)
+							bubble.bubblepower = PTSR.bubble_shoesid
+							
+							if P_RandomChance(FU/4) then
+								bubble.bubblepower = PTSR.bubble_flameshieldid
+							end
+							
+							PTSR.RefreshBubbleIcon(bubble)
+							
+							bubble.bubblerespawntics = 0
+						end
 					elseif not (PTSR.aipf
 					and PTSR.aipf.valid)
-						PTSR:SpawnPFAI()
+						PTSR.pfSpawnAI()
 					end
 				end
 			end
 		end
 
 		if PTSR.timeover then
+			/* SCRAPPED, DUE TO EVERY MAP'S SECTOR NOT HAVING A COLORMAP
+			for sector in sectors.iterate do
+				local skin = skincolors[SKINCOLOR_RED].ramp[4]
+				local r,g,b = color.paletteToRgb(skin)
+										
+				if sector.colormap then
+					local colormap = sector.colormap
+					colormap.red = r
+					colormap.green = g
+					colormap.blue = b
+					colormap.alpha = ease.linear(abs(sin(leveltime*FU*500)),0,255)
+				end
+			end
+			*/
 			PTSR.timeover_tics = $ + 1
 		end
 	end
