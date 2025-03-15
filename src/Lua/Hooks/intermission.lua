@@ -51,8 +51,8 @@ function PTSR.InitVoteScreen()
 	
 	S_StartSound(nil,sfx_s3kb3)
 	
-	S_ChangeMusic("P_INT", true)
-	mapmusname = "P_INT"
+	S_ChangeMusic("PT_INT", true)
+	mapmusname = "PT_INT"
 	
 	PTSR.vote_timeleft = CV_PTSR.voteseconds.value*TICRATE
 	PTSR.vote_screen = true
