@@ -110,7 +110,7 @@ addHook("ThinkFrame", function()
 		--PTSR.timeleft <= 56*TICRATE
 		if leveltime then -- srb2 is super slow tbh
 			if PTSR.timeover then
-				local mus = CV_PTSR.overtime_music.value or PTSR.MusicList.OvertimeTics
+				local mus = CV_PTSR.overtime_music.value
 				
 				local mus_str = PTSR.MusicList.Overtime
 				local gm_metadata = PTSR.currentModeMetadata()

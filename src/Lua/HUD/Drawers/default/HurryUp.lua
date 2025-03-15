@@ -8,6 +8,7 @@ end
 
 local hurryup_hud = function(v, player)
 	if not PTSR.timeleft then return end
+	if not PTSR.MusicList.OvertimeTics then return end
 	if PTSR.timeleft > PTSR.MusicList.OvertimeTics then return end
 	if not multiplayer then return end
 	if not PTSR.client_allowhurryupmusic then return end
