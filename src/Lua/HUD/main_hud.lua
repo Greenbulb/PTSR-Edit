@@ -187,3 +187,6 @@ path = "HUD/Drawers/default";
 PTSR.hudAddToStyleTable("Gamemode", "default", "minimal")
 PTSR.hudAddToStyleTable("ItsPizzaTime", "default", "minimal")
 PTSR.hudAddToStyleTable("PlayerPF", "default", "minimal")
+PTSR.hudAddToStyleTable("UntilEnd", "default", "minimal")
+PTSR.hudAddToStyleTable("HurryUp", "default", "minimal")
+PTSR.hudAddToStyleTable("Overtime", "default", "minimal")
