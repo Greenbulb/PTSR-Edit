@@ -73,7 +73,8 @@ local scoreboard_hud = function(v, player)
 			commonflags = $|V_SNAPTORIGHT &~V_SNAPTOLEFT
 		end
 
-		if not _player.ptsr.pizzaface then
+		if not _player.ptsr.pizzaface
+		and (_skinpatch and _skinpatch.valid) then
 			-- [Player Icon] --
 			v.drawScaled(_xcoord - FU, _ycoord, FU/2,
 				_skinpatch, (commonflags)|aliveflag, _colormap
