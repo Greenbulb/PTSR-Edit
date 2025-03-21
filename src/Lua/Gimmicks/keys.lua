@@ -139,7 +139,7 @@ addHook("MapThingSpawn", function(mo, thing)
 	PTSR.keys[id] = mo
 	mo.assignedType = id
 	
-	if not PTSR.doors["enter"][id] then return end
+	if not (PTSR.doors["enter"][id] and PTSR.doors["enter"][id].valid) then return end
 
 	PTSR.doors["enter"][id].state = S_PTSR_DOOR_LOCKED
 end, MT_PTSR_KEY)
