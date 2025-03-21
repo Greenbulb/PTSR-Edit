@@ -82,7 +82,7 @@ local function assignDoors(mo, type, id)
 	if PTSR.doors[oppositeType][id] then
 		local mo2 = PTSR.doors[oppositeType][id]
 
-		if mo2 and mo.valid then
+		if mo2 and mo2.valid then
 			mo.opposite_door = mo2
 			mo2.opposite_door = mo
 		end
