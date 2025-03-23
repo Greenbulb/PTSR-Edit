@@ -71,9 +71,9 @@ PTSR.default_playervars = {
 	justrevived = false,
 	
 	-- exists to save score when you die, is for rank screen when you die.
-	lastscore = nil, 
-	lastrank = nil,
-	lastlaps = nil,
+	deathscore = nil, 
+	deathrank = nil,
+	deathlaps = nil,
 
 	lastparryframe = nil,
 	cantparry = false, --this is for the pizzaface parry - saxa
