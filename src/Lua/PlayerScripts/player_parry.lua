@@ -72,10 +72,10 @@ addHook("ThinkFrame", function()
 				local player = object.player
 				
 				if v.old_x ~= nil and v.old_y ~= nil and v.old_z ~= nil and
-				v.old_state ~= nil and v.old_frame ~= nil then
+				v.old_sprite ~= nil and v.old_frame ~= nil then
 					P_SetOrigin(object, v.old_x, v.old_y, v.old_z);
 					
-					object.state = v.old_state;
+					object.sprite = v.old_sprite;
 					object.frame = v.old_frame;
 					
 					object.momx = 0;
@@ -303,7 +303,7 @@ PTSR.DoHitlag = function(mobj)
 			old_momx = mobj.momx,
 			old_momy = mobj.momy,
 			old_momz = mobj.momz,
-			old_state = mobj.state,
+			old_sprite = mobj.sprite,
 			old_frame = mobj.frame,
 		}
 	end
