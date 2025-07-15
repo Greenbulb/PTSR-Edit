@@ -5,6 +5,12 @@ function PTSR.EndGame()
 		PTSR.gameover = true
 		print("GAME OVER!")
 		
+		for p in players.iterate do
+			if p and p.ptsr and PTSR.PlayerHasCombo(p) then
+				PTSR:EndCombo(p)
+			end
+		end
+		
 		PTSR.endscreen_phase_tics = PTSR.results_act1
 		
 		if consoleplayer and consoleplayer.valid then
@@ -18,12 +24,6 @@ function PTSR.EndGame()
 			
 			if winnerplayer.ptsr then
 				winnerplayer.ptsr.isWinner = true
-			end
-		end
-		
-		for p in players.iterate do
-			if p and p.ptsr and PTSR.PlayerHasCombo(p) then
-				PTSR:EndCombo(p)
 			end
 		end
 		
