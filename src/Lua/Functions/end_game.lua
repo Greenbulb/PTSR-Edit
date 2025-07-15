@@ -2,14 +2,14 @@ local RANKMUS = PTSR.RANKMUS
 
 function PTSR.EndGame()
 	if not PTSR.gameover then
-		PTSR.gameover = true
-		print("GAME OVER!")
-		
 		for p in players.iterate do
 			if p and p.ptsr and PTSR.PlayerHasCombo(p) then
 				PTSR:EndCombo(p)
 			end
 		end
+		
+		PTSR.gameover = true
+		print("GAME OVER!")
 		
 		PTSR.endscreen_phase_tics = PTSR.results_act1
 		
